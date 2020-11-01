@@ -49,7 +49,7 @@ import {
   NotificationResponseItem,
   TransactionQueryPayload,
   DefaultPrivacyLevel,
-  Event
+  Event,
 } from "../../client/src/models";
 import Fuse from "fuse.js";
 import {
@@ -69,7 +69,6 @@ import {
   isCommentNotification,
 } from "../../client/src/utils/transactionUtils";
 import { DbSchema } from "../../client/src/models/db-schema";
-
 
 export type TDatabase = {
   users: User[];
@@ -696,6 +695,38 @@ const saveComment = (comment: Comment): Comment => {
   return getCommentById(comment.id);
 };
 
+// Events
+interface Filter {
+  sorting: string;
+  type?: string;
+  browser?: string;
+  search?: string;
+  offset?: number;
+}
+export const getAllEvents = () => db.get(EVENT_TABLE).value();
+
+export const getAllEventsFiltered = (filter: Filter): Event[] => {
+  const dateDirection: 1 | -1 = filter.sorting === "+date" ? 1 : -1;
+  //sort events first
+  const allEventsSorted = getAllEvents().sort(
+    (prev: Event, cur: Event) => (prev.date - cur.date) * dateDirection
+  );
+
+  if (!filter?.browser && !filter?.search && !filter?.type) return allEventsSorted;
+
+  const filterEvents = (event: Event, index: number, array: Event[]): boolean => {
+    const typeIsOkay: boolean = filter?.type ? event.name === filter.type : true;
+    const browserIsOkay: boolean = filter?.browser ? event.browser === filter.browser : true;
+    const searchIsOkay: boolean = filter?.search
+      ? Object.values(event).some((value) => RegExp(`${filter.search}`).test(value))
+      : true;
+    return typeIsOkay && browserIsOkay && searchIsOkay;
+  };
+  // filter events:
+  const allEventsfiltered = allEventsSorted.filter(filterEvents);
+  return allEventsfiltered;
+};
+
 // Notifications
 
 export const getNotificationBy = (key: string, value: any): NotificationType =>
@@ -862,6 +893,5 @@ export const getTransactionsBy = (key: string, value: string) =>
 
 /* istanbul ignore next */
 export const getTransactionsByUserId = (userId: string) => getTransactionsBy("receiverId", userId);
-
 
 export default db;
