@@ -69,6 +69,7 @@ import {
   isCommentNotification,
 } from "../../client/src/utils/transactionUtils";
 import { DbSchema } from "../../client/src/models/db-schema";
+import { query } from "express-validator";
 
 
 export type TDatabase = {
@@ -177,8 +178,9 @@ export const removeUserFromResults = (userId: User["id"], results: User[]) =>
 // convenience methods
 
 // Events:
-export const getAllEvents = () => db.get(EVENT_TABLE).value();
+export const getAllEvents = () => getAllForEntity("events");
 
+export const getEventsFilteredByQuery = (query: object) => getAllByObj("events", query)
 
 export const getEventBy = (key: string, value: any) => getBy(EVENT_TABLE, key, value);
 
@@ -188,8 +190,13 @@ export const getEventId = (Event: Event): string => Event._id;
 
 export const getEventById = (id: string) => getEventBy("_id", id);
 
-export const getEventsByEventName = (EventName: string) => getEventsBy("name", EventName);
-
+export const sortEventsByDate = (events: Event[], order?:string) => events.sort((eventA, eventB) => {
+  if(order && order === "DESC") {
+    return eventB.date - eventA.date;
+  } else {
+    return eventA.date - eventB.date
+  }
+})
 
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
