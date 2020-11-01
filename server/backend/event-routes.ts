@@ -21,10 +21,10 @@ const router = express.Router();
 
 interface Filter {
   sorting: string;
-  type?: string;
-  browser?: string;
-  search?: string;
-  offset?: number;
+  type: string;
+  browser: string;
+  search: string;
+  offset: number;
 }
 
 router.get('/all', (req: Request, res: Response) => {
