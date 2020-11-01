@@ -3,6 +3,7 @@ import { Interpreter } from "xstate";
 import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 import { makeStyles, Paper, Typography, Box } from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
+import EventsMap from '../components/dashboard components/EventsMap'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -39,6 +40,7 @@ const DashBoard: React.FC = () => {
         border={1}
         borderColor={grey[200]}
       >
+        <EventsMap></EventsMap>
       </Box>
       </Paper>
     </>
