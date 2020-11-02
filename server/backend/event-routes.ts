@@ -25,18 +25,17 @@ interface Filter {
   search?: string;
   offset?: number;
 }
+function getAllEvents(): Event[];
+function getAllEvents(query: Filter): { more: boolean; events: Event[] };
 function getAllEvents(query?: Filter): { more: boolean; events: Event[] } | Event[] {
   let more = false;
   let events = db.get("events").value();
-  console.log(query);
   if (query) {
     if (Object.keys(query).some((val) => ["type", "browser", "search"].includes(val))) {
-      console.log(query);
       let newRes = [];
       for (let i = 0; i < events.length; i++) {
         if (query.offset && Number(query.offset) === newRes.length) {
           more = true;
-          console.log("break");
           break;
         }
         let type = query?.type ? query.type === events[i].name : true;
@@ -55,9 +54,6 @@ function getAllEvents(query?: Filter): { more: boolean; events: Event[] } | Even
       events = newRes;
     }
     if (query.sorting) {
-      console.log(query);
-      console.log(Object.keys(query));
-
       let operator: string | undefined;
       let { sorting } = query;
       if (sorting[0] === "-" || sorting[0] === "+") {
@@ -89,11 +85,82 @@ router.get("/all-filtered", (req: Request, res: Response) => {
 });
 
 router.get("/by-days/:offset", (req: Request, res: Response) => {
-  res.send("/by-days/:offset");
+  let offset = +req.params.offset;
+  let today = Date.now();
+  let answer: any = {};
+  let day = 1000 * 60 * 60 * 24;
+  let start = today - offset * day;
+  for (let i = 6; i >= 0; i--) {
+    let date = new Date(start - i * day).toLocaleDateString();
+    answer[date] = {};
+  }
+  let events = getAllEvents();
+  events.forEach((event) => {
+    let dateString = new Date(event.date).toLocaleDateString();
+    if (Object.keys(answer).includes(dateString)) {
+      answer[dateString][event.session_id] = 1;
+    }
+  });
+  let result: { date: string; count: number }[] = [];
+  for (let date in answer)
+    result.push({ date: date.replace(/\./g, "/"), count: Object.keys(answer[date]).length });
+
+  res.send(result);
 });
 
 router.get("/by-hours/:offset", (req: Request, res: Response) => {
-  res.send("/by-hours/:offset");
+  let offset = +req.params.offset;
+  let today = new Date();
+  let answer: any = {};
+  let hour = 1000 * 60 * 60;
+  let day = hour * 24;
+  let events = getAllEvents();
+  let midnight = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+  let elapsedSinceMidnight = today.getTime() - midnight.getTime();
+  if (offset === 0) {
+    for (let i = 23; i >= 0; i--) {
+      answer[String(i).padStart(2, "0") + `:00`] = {};
+    }
+    events.forEach(event=>{
+      if (today.getTime()-elapsedSinceMidnight<event.date){
+        let time = String(new Date(event.date).getHours()).padStart(2, "0") + `:00`;
+        answer[time][event.session_id] = 1;
+      }
+    })
+    // let now = today.getHours();
+    // while (Object.keys(answer).length < 24) {
+    //   answer[String(now).padStart(2, "0") + `:00`] = {};
+    //   now--;
+    //   if (now < 0) now = 23;
+    // }
+
+    // events.forEach((event) => {
+    //   if (today.getTime() - event.date <= day) {
+    //     let time = String(new Date(event.date).getHours()).padStart(2, "0") + `:00`;
+    //     answer[time][event.session_id] = 1;
+    //   }
+    // });
+  } else {
+    for (let i = 23; i >= 0; i--) {
+      answer[String(i).padStart(2, "0") + `:00`] = {};
+    }
+
+    let timeTravel = elapsedSinceMidnight + (offset - 1) * day;
+    events.forEach((event) => {
+      if (
+        today.getTime() - timeTravel - day < event.date &&
+        event.date < today.getTime() - timeTravel
+      ) {
+        let time = String(new Date(event.date).getHours()).padStart(2, "0") + `:00`;
+        answer[time][event.session_id] = 1;
+      }
+    });
+  }
+  
+  let result: { hour: string; count: number }[] = [];
+  for (let date in answer) result.push({ hour: date, count: Object.keys(answer[date]).length });
+
+  res.send(result);
 });
 
 router.get("/today", (req: Request, res: Response) => {
