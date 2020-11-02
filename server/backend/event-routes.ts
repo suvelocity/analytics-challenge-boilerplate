@@ -64,9 +64,13 @@ router.get('/all', (req: Request, res: Response) => {
 router.get('/all-filtered',  (req: Request, res: Response) => {
   const filters: Filter = req.query;
   console.log(filters);
-  //TODO add sorting
   const events: any[]= getAllEvents();
   let eventsAfterFillering: event[]=[...events];
+  if(filters.sorting==="+date"){
+    eventsAfterFillering.sort((a, b) => a.date - b.date);
+  } else{
+    eventsAfterFillering.sort((a, b) => b.date - a.date);
+  }
   if(filters.type){
       eventsAfterFillering=eventsAfterFillering.filter((event: event) => event.name === filters.type);
   }
@@ -74,8 +78,6 @@ router.get('/all-filtered',  (req: Request, res: Response) => {
       eventsAfterFillering=eventsAfterFillering.filter((event: event) => event.browser === filters.browser);
   }
   if(filters.search){
-      console.log(filters.search);
-      
       eventsAfterFillering=eventsAfterFillering.filter((event: any) => {
           let ifIncludes=false;
           for (const key in event) {
