@@ -198,9 +198,17 @@ export const sortEventsByDate = (events: Event[], order?:string) => events.sort(
   }
 })
 
-export const getEventsByDateLimit = (bottomLimit:number, topLimit:number) => 
+export const getEventsByDateLimitGroupedBySessions = (bottomLimit:number, topLimit:number) => 
   db.get("events").filter((event:Event) => 
     event.date > bottomLimit && event.date < topLimit).groupBy("session_id").value();
+
+export const getSpecificEventsByDateLimit = (bottomLimit:number, topLimit:number, key:string, value:any) => 
+  db.get("events").filter((event:Event) => event.date > bottomLimit && event.date < topLimit)
+  .filter({ [`${key}`]: value }).value();
+
+export const getAllEventsButOneByDateLimit = (bottomLimit:number, topLimit:number, key:keyof Event, value:any) =>    
+  db.get("events").filter((event:Event) => event.date > bottomLimit && event.date < topLimit)
+  .filter((event:Event) => event[key] !== `${value}`).value();
 
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
