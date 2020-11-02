@@ -875,7 +875,9 @@ export const getEventsBy = (key: string, value: any) => getAllBy(EVENT_TABLE, ke
 
 export const getEventsByUserId = (userId: string): Event[] => getEventsBy("userId", userId);
 
-export const getRetentionCohort = ():weeklyRetentionObject[] => {
+export const getRetentionCohort = (dayZeroNumber:number):weeklyRetentionObject[] => {
+  
+  const dayZero:number = new Date(new Date(dayZeroNumber).toUTCString()).getTime()
   
   const signups:Event[] = db
   .get('events')
@@ -889,18 +891,23 @@ export const getRetentionCohort = ():weeklyRetentionObject[] => {
   .filter({ ['name']: 'login' })
   .orderBy('date')
   .value()
-  
+
   const weekEnds:number[] = []
   // stores the end time of every week since dayZero
-  for(let d = dayZero ; d<=Date.now()+OneWeek;d+=OneWeek ){ 
-    weekEnds.push(d+OneWeek)
+  
+  for(
+      let d = new Date(new Date(dayZero-2*OneHour).toDateString()).getTime() ;
+      d < new Date(new Date().toDateString()).getTime()+OneWeek ;
+      d+=OneWeek+2*OneHour
+    ){ 
+    weekEnds.push(new Date(new Date(d).toDateString()).getTime()+OneWeek-1)
   }
   
-
   const weeklyRetention:weeklyRetentionObject[] = weekEnds.map((weekEnd,weekNumber) => {
     //first isolate the new Users the week
-    const firstSignupNextWeek = signups.findIndex(signup=>signup.date>=weekEnd)
-    let weeksNewSignups = signups.splice(0,firstSignupNextWeek>=0 ? firstSignupNextWeek : 0)
+    
+    let weeksNewSignups = signups.filter((signup:Event) => signup.date <= weekEnd)
+    signups.splice(0, weeksNewSignups.length);
     
     //second isolate the logins of users who started this week
     const loginsByNewUsers = logins
@@ -909,30 +916,34 @@ export const getRetentionCohort = ():weeklyRetentionObject[] => {
     })
     
     const weeklyRetention:number[] = []
-
+    
     //third for every following week we must find how many of the new Users came back 
-    for(let i=weekNumber;i<weekEnds.length-1;i++){
-      const returnedUsers : string[] = []
-
-      const firstLoginNextWeek:number = loginsByNewUsers.findIndex(login=>login.date>=weekEnds[i])
-      let weeksLogins = loginsByNewUsers.splice(0,firstLoginNextWeek>=0 ? firstLoginNextWeek : 0)
-      // if(weekNumber==1){console.log(weeksLogins.length)}
-      weeksLogins.forEach(({distinct_user_id})=>{
-        if(!returnedUsers.includes(distinct_user_id)){
-          returnedUsers.push(distinct_user_id)
+    for(let i=weekNumber;i<weekEnds.length;i++){
+      
+      const returnedUsers : {id:string,date:string}[] = []
+      
+      let weeksLogins = loginsByNewUsers.filter((login:Event) => login.date <= weekEnds[i])
+      loginsByNewUsers.splice(0, weeksLogins.length);
+      
+      weeksLogins.forEach(({distinct_user_id,date})=>{
+        if(!returnedUsers.some(user=>user.id===distinct_user_id)){
+          returnedUsers.push({id:distinct_user_id,date:new Date (date).toDateString()})
         }
       })
-     
+      if(weekNumber === 0 && i === 1 || weekNumber === 4 && i === 5){
+      console.log('week'+weekNumber,returnedUsers)
+      }
       weeklyRetention.push(returnedUsers.length)
     } 
-
-    const newUsers = (weekNumber!==weekEnds.length-1?weeksNewSignups:signups).length
-    const weeklyRetentionPercent= [100].concat(newUsers
-      ?weeklyRetention.map(returnedUsers=>Math.round(100*returnedUsers/newUsers))
-      :weeklyRetention
-    )
-    return {
-      registrationWeek: weekNumber,
+    
+    const newUsers = weeksNewSignups.length
+    const weeklyRetentionPercent= [100].concat(
+      newUsers
+      ?weeklyRetention.slice(1).map(returnedUsers=>Math.round(100*returnedUsers/newUsers))
+      :weeklyRetention.slice(1)
+      )
+      return {
+        registrationWeek: weekNumber,
       start:new Date( dayZero + weekNumber * OneWeek ).toDateString().slice(4),
       end:(new Date( weekEnds[weekNumber]-1)).toDateString().slice(4),
       newUsers:newUsers,      

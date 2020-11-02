@@ -107,8 +107,9 @@ router.get("/all-filtered", (req: Request, res: Response) => {
 
 
 router.get("/retention", (req: Request, res: Response) => {
-  const retentionCohort:weeklyRetentionObject[] = getRetentionCohort();
-  
+  const {dayZero}:{dayZero:number|string}= req.query;
+  const retentionCohort:weeklyRetentionObject[] = getRetentionCohort(Number(dayZero));
+
   res.json(retentionCohort);
 });
 
@@ -195,6 +196,53 @@ router.post(
   })
   
   
+  // router.get('/chart/timeonpage/allusers',(req,res) => {
+    
+  //   const allEvents = getAllEvents();
+    
+  //   let userURLdetails: 
+  //   {"userId": string, 
+  //   "username": string, 
+  //   "login": number, 
+  //   "signin": number, 
+  //   "admin": number, 
+  //   "home": number}[] = [];
+    
+  //   allEvents.forEach(event => {
+      
+  //     const userEvents: Event[] = getEventsByUserId(user.id);
+      
+  //     let counterTimeLogin = 0;
+  //     let counterTimeSignin = 0;
+  //     let counterTimeAdmin = 0;
+  //     let counterTimeHome = 0;
+      
+  //   userEvents.forEach(event => {
+  //     if (event.url === "http://localhost3000/login") {
+  //       counterTimeLogin += event.date;      
+  //     } else if (event.url === "http://localhost3000/signup") {
+  //       counterTimeSignin += event.date;
+  //     } else if (event.url === "http://localhost3000/admin") {
+  //       counterTimeAdmin += event.date;
+  //     } else if (event.url === "http://localhost3000/") {
+  //       counterTimeHome += event.date;
+  //     }
+  //   })
+    
+  //   userURLdetails.push({
+  //     "userId": user.id, 
+  //     "username": user.username, 
+  //     "login": counterTimeLogin , 
+  //     "signin": counterTimeSignin , 
+  //     "admin": counterTimeAdmin , 
+  //     "home": counterTimeHome 
+  //   })
+    
+  // })
+
+  // res.status(200);
+  // res.send(userURLdetails);
+// });
   router.get('/chart/timeonpage/allusers',(req,res) => {
     
     const allUsers = getAllUsers();
@@ -208,6 +256,7 @@ router.post(
     "home": number}[] = [];
     
     allUsers.forEach(user => {
+
       const userEvents: Event[] = getEventsByUserId(user.id);
       
       let counterTimeLogin = 0;
@@ -230,24 +279,24 @@ router.post(
     userURLdetails.push({
       "userId": user.id, 
       "username": user.username, 
-      "login": counterTimeLogin / 1000, 
+      "login": counterTimeLogin , 
       "signin": counterTimeSignin , 
       "admin": counterTimeAdmin , 
       "home": counterTimeHome 
     })
     
   })
-  let counterLogin = 0;
-  let counterSignin = 0;
-  let counterAdmin = 0;
-  let counterHome = 0;
+  // let counterLogin = 0;
+  // let counterSignin = 0;
+  // let counterAdmin = 0;
+  // let counterHome = 0;
   
-  userURLdetails.forEach((user) => {
-    counterLogin +=  user.login;
-    counterSignin += user.signin;
-    counterAdmin += user.admin;
-    counterHome += user.home;
-  });
+  // userURLdetails.forEach((user) => {
+  //   counterLogin +=  user.login;
+  //   counterSignin += user.signin;
+  //   counterAdmin += user.admin;
+  //   counterHome += user.home;
+  // });
   res.status(200);
   res.send(userURLdetails);
 });

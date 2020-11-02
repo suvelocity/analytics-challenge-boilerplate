@@ -24,13 +24,14 @@ const weekDataBlock = (week: weeklyRetentionObject) => {
 const RetentionCohort = () => {
   const [weeks, setWeeks] = useState<weeklyRetentionObject[]>([]);
   useEffect(()=>{
-    axios.get("http://localhost:3001/events/retention")
+    axios.get("http://localhost:3001/events/retention?dayZero=1601265600000")
     .then(({data})=>{setWeeks((data))});
   },[])
   
   const totalUsers = weeks.reduce((total, current) => {
     return total + current.newUsers;
   }, 0);
+
   function CalculateAllUsersRetention(registrationWeek: number) {
     const retentionByWeek: number[] = weeks.map((week) => {
       const { weeklyRetention } = week;
@@ -46,7 +47,7 @@ const RetentionCohort = () => {
 
   return (
     <div className="retention-cohort">
-      <button onClick={()=>{console.log(weeks)}}>clk</button>
+      <button onClick={()=>{console.log(weeks)}}>click</button>
       <h1>User Retention</h1>
       <div className="table-container">
         <table>
@@ -55,7 +56,7 @@ const RetentionCohort = () => {
               <th>registration</th>
               {weeks.map((week) => (
                 <th key={"week" + week.registrationWeek}>{
-                  `week${week.registrationWeek}`
+                  `week ${week.registrationWeek}`
                   }</th>
               ))}
             </tr>
