@@ -4,6 +4,7 @@ import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 import { makeStyles, Paper, Typography, Box } from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
 import EventsMap from '../components/dashboard components/EventsMap'
+import ErrorBoundary from '../containers/ErrorBoundaries'
 
 
 const useStyles = makeStyles((theme) => ({
@@ -40,7 +41,9 @@ const DashBoard: React.FC = () => {
         border={1}
         borderColor={grey[200]}
       >
-        <EventsMap></EventsMap>
+        <ErrorBoundary>
+          <EventsMap/>
+        </ErrorBoundary>
       </Box>
       </Paper>
     </>
