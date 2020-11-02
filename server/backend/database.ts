@@ -50,6 +50,7 @@ import {
   TransactionQueryPayload,
   DefaultPrivacyLevel,
   Event,
+  weeklyRetentionObject,
 } from "../../client/src/models";
 import Fuse from "fuse.js";
 import {
@@ -738,14 +739,14 @@ export const getAllUniqueSessionsInRange = (
   const allEvents = getAllEvents();
   const intervals = [startDate];
   while (endDate > startDate) intervals.push((startDate += interval));
-  console.log(intervals);
+
   const b = intervals.flatMap((inter) =>
     uniqBy(
       "session_id",
       allEvents.filter((event: Event) => inRange(inter, inter + interval, event.date))
     )
   );
-  console.log(b.length);
+
   return b;
 };
 
@@ -812,6 +813,66 @@ export const getSessionsByHoursInDay = (startDate: number) => {
     getAllUniqueSessionsInRange(startDate + alonTime.OneHour * 23, startDate, alonTime.OneHour),
     startDate,
     24
+  );
+};
+
+export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[] => {
+  const today = new Date().setHours(0, 0, 0, 0);
+  const weekStartPoints: number[] = [];
+  const allRegistrations = getAllEventsFiltered({ sorting: "-date", type: "signup" });
+  const allEvents = getAllEvents();
+  // while (dayZero < today) weekStartPoints.push((dayZero += alonTime.OneWeek));
+  for (let i = dayZero; i <= today; i += alonTime.OneWeek) {
+    weekStartPoints.push(i);
+  }
+  const allUniqueActiveUsersByWeeks: string[][] = weekStartPoints.map((weekStartPoint: number) =>
+    uniqBy(
+      "distinct_user_id",
+      allEvents.filter((event: Event) =>
+        inRange(weekStartPoint, weekStartPoint + alonTime.OneWeek, event.date)
+      )
+    ).map((uniqueUserEvent: Event) => uniqueUserEvent.distinct_user_id)
+  );
+  console.log(allUniqueActiveUsersByWeeks);
+  const newUsersByWeek: string[][] = weekStartPoints.map((weekStartPoint: number) =>
+    allRegistrations
+      .filter((registration: Event) =>
+        inRange(weekStartPoint, weekStartPoint + alonTime.OneWeek, registration.date)
+      )
+      .map((registration: Event) => registration.distinct_user_id)
+  );
+  return weekStartPoints.map((weekStartPoint: number, i: number) => {
+    return {
+      registrationWeek: i + 1,
+      newUsers: newUsersByWeek[i].length,
+      weeklyRetention: allUniqueActiveUsersByWeeks
+        .slice(i)
+        .map((uniqueUsersOfWeek: string[]) =>
+          Math.floor(
+            (uniqueUsersOfWeek.filter((userId: string) => newUsersByWeek[i].includes(userId))
+              .length /
+              newUsersByWeek[i].length) *
+              100
+          )
+        ),
+      start: formatToStringDate(weekStartPoint),
+      end: formatToStringDate(weekStartPoint + alonTime.OneWeek),
+    };
+  });
+};
+
+export const saveNewEvent = (event: Event) => {
+  db.get(EVENT_TABLE).push(event).write();
+};
+
+const formatToStringDate = (dateInMs: number): string => {
+  const date = new Date(dateInMs);
+  return (
+    date.getDate().toString().padStart(2, "0") +
+    "/" +
+    (date.getMonth() + 1) +
+    "/" +
+    date.getFullYear()
   );
 };
 // Notifications

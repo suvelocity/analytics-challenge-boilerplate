@@ -7,8 +7,10 @@ import { Request, Response } from "express";
 import {
   getAllEvents,
   getAllEventsFiltered,
+  getRetentionFromDayZero,
   getSessionsByDayInWeek,
   getSessionsByHoursInDay,
+  saveNewEvent,
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -64,7 +66,7 @@ router.get("/by-days/:offset", (req: Request, res: Response) => {
   const startDate: number = endDate - alonTime.OneDay * 6;
 
   const byDays = getSessionsByDayInWeek(startDate, endDate);
-  console.log(byDays);
+
   res.json(byDays);
 });
 
@@ -74,7 +76,7 @@ router.get("/by-hours/:offset", (req: Request, res: Response) => {
   const startDate = new Date().setHours(0, 0, 0) - parseInt(offset) * alonTime.OneDay;
 
   const byHours = getSessionsByHoursInDay(startDate);
-  console.log(byHours);
+
   res.json(byHours);
 });
 
@@ -87,15 +89,19 @@ router.get("/week", (req: Request, res: Response) => {
 });
 
 router.get("/retention", (req: Request, res: Response) => {
-  const { dayZero } = req.query;
-  res.send("/retention");
+  const dayZero = new Date(parseInt(req.query.dayZero)).setHours(0, 0, 0, 0);
+  const retention = getRetentionFromDayZero(dayZero);
+  res.json(retention);
 });
 router.get("/:eventId", (req: Request, res: Response) => {
   res.send("/:eventId");
 });
 
+//passing test - DO NOT TOUCH
 router.post("/", (req: Request, res: Response) => {
-  res.send("/");
+  const newEvent: Event = req.body;
+  saveNewEvent(newEvent);
+  res.sendStatus(200);
 });
 
 router.get("/chart/os/:time", (req: Request, res: Response) => {

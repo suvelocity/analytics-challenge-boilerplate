@@ -91,7 +91,7 @@ describe("main test", () => {
     ).toBe(25);
   });
 
-  it("retention cohort", async () => {
+  it.only("retention cohort", async () => {
     const today = new Date(new Date().toDateString()).getTime() + 6 * OneHour;
     const dayZero = today - 5 * OneWeek;
 
