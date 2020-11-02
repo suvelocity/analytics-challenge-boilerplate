@@ -198,6 +198,10 @@ export const sortEventsByDate = (events: Event[], order?:string) => events.sort(
   }
 })
 
+export const getEventsByDateLimit = (bottomLimit:number, topLimit:number) => 
+  db.get("events").filter((event:Event) => 
+    event.date > bottomLimit && event.date < topLimit).groupBy("session_id").value();
+
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);
 export const getUserId = (user: User): string => user.id;
