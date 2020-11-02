@@ -24,7 +24,7 @@ const weekDataBlock = (week: weeklyRetentionObject) => {
 const RetentionCohort = () => {
   const [weeks, setWeeks] = useState<weeklyRetentionObject[]>([]);
   useEffect(()=>{
-    axios.get("http://localhost:3001/events/retention")
+    axios.get("http://localhost:3001/events/retention?dayZero=1601265600000")
     .then(({data})=>{setWeeks((data))});
   },[])
   

@@ -1,5 +1,4 @@
 import React from "react";
-import Tile from "../components/tiles/Tile";
 import GeoTile from "../components/tiles/GeoTile2";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
@@ -11,13 +10,14 @@ import SessionsByDayChart from "../components/tiles/SessionsChartByDay";
 import EventLog from "../components/tiles/EventsLog";
 import SessionsByHourChsrt from "../components/tiles/SessionsChartByHour";
 import RetentionCohort from "../components/tiles/RetentionCohort";
+import Draggable from 'react-draggable';
 
 const useStyles = makeStyles((theme) => ({
   dashboard: {
     flexGrow: 1,
-    gap: "20px",
+    gap: "50px",
     marginTop: "20px",
-    maxWidth: "95vw",
+    maxWidth: "300vw",
     marginLeft: "auto",
     marginRight: "auto",
   },
@@ -25,7 +25,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     boxShadow: "0.5px 0px 0.5px 2px black",
-    height: "43vh",
+    height: "50vh",
+    width: "80vh",
     minWidth: "300px",
     minHeight: "250px",
     padding: "0px",
@@ -35,7 +36,8 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     boxShadow: "0.5px 0px 0.5px 2px black",
     height: "70vh",
-    minWidth: "90vw",
+    width: "100vh",
+    minWidth: "70vw",
     minHeight: "250px",
     padding: "0px",
   },
@@ -56,40 +58,54 @@ const DashBoard: React.FC = () => {
       <ErrorBoundary>
         <Grid container justify={"center"} spacing={10} className={classes.dashboard}>
           <ErrorBoundary>
-            <Grid item className={classes.GeoTile} xs={10}>
-              <GeoTile />
-            </Grid>
+            <Draggable>
+              <Grid item className={classes.GeoTile} xs={10}>
+                  <GeoTile />
+              </Grid>
+            </Draggable>
           </ErrorBoundary>
           <ErrorBoundary>
-            <Grid item className={classes.tile} xs={5}>
-              <SessionsByDayChart />
-            </Grid>
+            <Draggable>
+              <Grid item className={classes.tile} xs={5}>
+                <SessionsByDayChart />
+              </Grid>
+            </Draggable>
           </ErrorBoundary>
           <ErrorBoundary>
+          <Draggable>
             <Grid item className={classes.tile} xs={6}>
               <SessionsByHourChsrt />
             </Grid>
+            </Draggable>
           </ErrorBoundary>
           <ErrorBoundary>
+          <Draggable>
             <Grid item className={classes.tile} xs={5}>
               <TimeOnURLChartPie />
             </Grid>
+            </Draggable>
           </ErrorBoundary>
           <ErrorBoundary>
+          <Draggable>
             <Grid item className={classes.tile} xs={6}>
               <TimeOnURLChartBar />
             </Grid>
+            </Draggable>
           </ErrorBoundary>
           <ErrorBoundary>
-            <Grid item className={classes.GeoTile} xs={7}>
-              <RetentionCohort />
-            </Grid>
-          </ErrorBoundary>
-          <ErrorBoundary>
+          <Draggable>
             <Grid item className={classes.tile} xs={7}>
               <EventLog />
             </Grid>
+            </Draggable>
           </ErrorBoundary>
+          <ErrorBoundary>
+          <Draggable>
+            <Grid item className={classes.GeoTile} xs={7}>
+              <RetentionCohort />
+            </Grid>
+            </Draggable>
+            </ErrorBoundary>
         </Grid>
       </ErrorBoundary>
     </>
