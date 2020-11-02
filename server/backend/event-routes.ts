@@ -78,17 +78,20 @@ router.get('/all-filtered',  (req: Request, res: Response) => {
       eventsAfterFillering=eventsAfterFillering.filter((event: event) => event.browser === filters.browser);
   }
   if(filters.search){
+      const regex: RegExp = new RegExp(filters.search, "i");
       eventsAfterFillering=eventsAfterFillering.filter((event: any) => {
-          let ifIncludes=false;
           for (const key in event) {
-              if(ifIncludes) return ifIncludes
               if(typeof event[key]==="string"){
-                  ifIncludes=event.key.includes(filters.search);
+                if(event[key].match(regex)){
+                  return true;
+                }
               }else if(typeof event[key]==="number"){
-                  ifIncludes=event[key].toString().includes(filters.search);
+                if(event[key].toString().match(regex)){
+                  return true;
+                }
               }
           }
-          return ifIncludes
+          return false;
       });
   }
   if(filters.offset){
