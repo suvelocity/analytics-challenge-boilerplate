@@ -5,7 +5,8 @@ import { Request, Response } from "express";
 
 // some useful database functions in here:
 import {
-  getAllEvents
+  getAllEvents,
+  createNewEvents
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware, groupBy, formatDate, createArrayWeekAgo, diffrenceInDays, createArrayByHours } from "./helpers";
@@ -33,7 +34,7 @@ type Location = {
 };
 
 
-interface event {
+export interface event {
  _id: string;
 session_id: string;
 name: eventName;
@@ -133,42 +134,59 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
   });
   res.send(arrayByHours)
 });
-router.get('/today', (req: Request, res: Response) => {
-  res.send('/today')
-});
 
-router.get('/week', (req: Request, res: Response) => {
-  res.send('/week')
-});
 
-router.get('/retention', (req: Request, res: Response) => {
-  const {dayZero} = req.query
-  res.send('/retention')
-});
-router.get('/:eventId',(req : Request, res : Response) => {
-  res.send('/:eventId')
-});
 
+
+// router.get('/today', (req: Request, res: Response) => {
+//   res.send('/today')
+// });
+
+// router.get('/week', (req: Request, res: Response) => {
+//   res.send('/week')
+// });
+
+// router.get('/retention', (req: Request, res: Response) => {
+//   const {dayZero} = req.query
+//   res.send('/retention')
+// });
+// router.get('/:eventId',(req : Request, res : Response) => {
+//   res.send('/:eventId')
+// });
+// interface event {
+//   _id: string;
+//  session_id: string;
+//  name: eventName;
+//  url: string;
+//  distinct_user_id: string;
+//  date: number; // Date.prototype.getTime()
+//  os: os;
+//  browser: browser;
+//  geolocation: GeoLocation;
+//  }
+ 
 router.post('/', (req: Request, res: Response) => {
-  res.send('/')
+  const newEvent:event=req.body;
+  createNewEvents(newEvent);
+  res.send("SUCCESS")
 });
 
-router.get('/chart/os/:time',(req: Request, res: Response) => {
-  res.send('/chart/os/:time')
-})
+// router.get('/chart/os/:time',(req: Request, res: Response) => {
+//   res.send('/chart/os/:time')
+// })
 
   
-router.get('/chart/pageview/:time',(req: Request, res: Response) => {
-  res.send('/chart/pageview/:time')
-})
+// router.get('/chart/pageview/:time',(req: Request, res: Response) => {
+//   res.send('/chart/pageview/:time')
+// })
 
-router.get('/chart/timeonurl/:time',(req: Request, res: Response) => {
-  res.send('/chart/timeonurl/:time')
-})
+// router.get('/chart/timeonurl/:time',(req: Request, res: Response) => {
+//   res.send('/chart/timeonurl/:time')
+// })
 
-router.get('/chart/geolocation/:time',(req: Request, res: Response) => {
-  res.send('/chart/geolocation/:time')
-})
+// router.get('/chart/geolocation/:time',(req: Request, res: Response) => {
+//   res.send('/chart/geolocation/:time')
+// })
 
 
 export default router;

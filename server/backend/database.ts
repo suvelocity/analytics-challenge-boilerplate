@@ -107,7 +107,18 @@ export const seedDatabase = () => {
   db.setState(testSeed).write();
   return;
 };
- export const getAllEvents=()=>db.get(EVENT_TABLE).value();
+
+//-------------------------------------MY CODE-------------------------------------
+ import {event} from "./event-routes"
+export const getAllEvents=()=>db.get(EVENT_TABLE).value();
+
+export const createNewEvents = (newEvent: event) => {
+  db.get(EVENT_TABLE).push(newEvent).write();
+  // return getBankAccountBy("id", bankaccount.id);
+};
+
+//-------------------------------------MY CODE-------------------------------------
+
 export const getAllUsers = () => db.get(USER_TABLE).value();
 
 export const getAllPublicTransactions = () =>
