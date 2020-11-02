@@ -126,7 +126,6 @@ const EventComponent: React.FC<EventComponentProps> = ({ event }) => {
                 <EventDetail>User {event.distinct_user_id}</EventDetail>
               </Typography>
               <EventDetail>Date: {new Date(event.date).toLocaleString()}</EventDetail>
-              {/* <EventDetail>Location: {event.geolocation}</EventDetail> */}
               <EventDetail>Browser: {event.browser}</EventDetail>
               <EventDetail>Session ID: {event.session_id}</EventDetail>
             </Typography>

@@ -107,7 +107,8 @@ router.get("/all-filtered", (req: Request, res: Response) => {
 
 
 router.get("/retention", (req: Request, res: Response) => {
-  const retentionCohort:weeklyRetentionObject[] = getRetentionCohort();
+  const { dayZero } : { dayZero: number | string } = req.query;
+  const retentionCohort:weeklyRetentionObject[] = getRetentionCohort(Number(dayZero));
   
   res.json(retentionCohort);
 });
