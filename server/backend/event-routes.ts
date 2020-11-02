@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 
 // some useful database functions in here:
 import {
-  getAllEvents, getAllEventsButOneByDateLimit, getEventsByDateLimitGroupedBySessions, getSpecificEventsByDateLimit, sortEventsByDate
+  getAllEvents, getEventsGroupedByDay, getSpecificEventsByDateLimit, sortEventsByDate, getGroupdEventsByDateLimitForApi, getEventsByDateLimitGroupedByDate, saveEvent
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -36,7 +36,7 @@ interface Filter {
 }
 
 // helpers
-const createDateString: (timeStamp:number) => string = function(timeStamp) {
+export const createDateString: (timeStamp:number) => string = function(timeStamp) {
   const date = new Date(timeStamp);
   return `${date.getDate()}/${date.getMonth()+1}/${date.getFullYear()}`;
 }
@@ -95,35 +95,28 @@ router.get('/all-filtered', (req: Request, res: Response) => {
 router.get('/by-days/:offset', (req: Request, res: Response) => {
   const offset = req.params.offset
   const XdaysToCountBack:number = Number(offset);
-  const now = new Date()
-  const oneWeekAndXdaysAgo = new Date();
-  const XdaysAgo = new Date();
-  oneWeekAndXdaysAgo.setDate(now.getDate() - XdaysToCountBack - 6);
-  oneWeekAndXdaysAgo.setHours(0,0,0);
-  XdaysAgo.setDate(now.getDate() - XdaysToCountBack);
-  XdaysAgo.setHours(24,0,0);
-
-  const offsetEvents = getEventsByDateLimitGroupedBySessions(oneWeekAndXdaysAgo.getTime(), XdaysAgo.getTime());
-
-  const groupedEvents:{date:string, events:Event[]}[] = [];
-
-  for(const sessionId in offsetEvents) {
-    (offsetEvents[sessionId].forEach((event:Event) => { 
-      let i = groupedEvents.findIndex((object) => 
-      (object.date) === createDateString(event.date))
-      
-      if(i!==-1) {
-        groupedEvents[i].events.push(event);
-      } else {
-        groupedEvents.push({date:createDateString(event.date), events:[event]});
-      }
-    }))
-  } 
   
-  const results:{date:string, count:number}[] = groupedEvents.map((group:{date:string,events:Event[]}) => {
-    
-    return {date: group.date, count:group.events.length};
-  })
+  const now = new Date()
+
+  const oneWeekAndXdaysAgo = new Date();
+  oneWeekAndXdaysAgo.setDate(now.getDate() - XdaysToCountBack - 6);
+  oneWeekAndXdaysAgo.setHours(0,0,0,0);
+  console.log(oneWeekAndXdaysAgo)
+
+  const XdaysAgo = new Date(oneWeekAndXdaysAgo);
+  XdaysAgo.setDate(oneWeekAndXdaysAgo.getDate() + 7);
+  XdaysAgo.setHours(oneWeekAndXdaysAgo.getHours());
+  console.log(XdaysAgo)
+
+  const groupdEvents = getGroupdEventsByDateLimitForApi(oneWeekAndXdaysAgo.getTime(), XdaysAgo.getTime());
+
+  const dates = groupdEvents.map(groupedEvent => Object.keys(groupedEvent));
+  const values = groupdEvents.map(groupedEvent => Object.values(groupedEvent));
+
+  const results:object[] = groupdEvents.map((groupedEvent, i) => {
+    return {date: dates[i][0], count:values[i][0]}
+  }) 
+
 
   res.send(results)
 });
@@ -132,6 +125,7 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
   const offset = req.params.offset
   const XdaysToCountBack:number = Number(offset);
   const now = new Date();
+  now.setHours(0,0,0,0);
   const XdaysAgoStart = new Date();
   const XdaysAgoEnd = new Date();
   XdaysAgoStart.setDate(now.getDate() - XdaysToCountBack);
@@ -139,9 +133,7 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
   XdaysAgoEnd.setDate(now.getDate() - XdaysToCountBack + 1);
   XdaysAgoEnd.setHours(0,0,0,0);
 
-  const offsetEvents = getEventsByDateLimitGroupedBySessions(XdaysAgoStart.getTime(), XdaysAgoEnd.getTime());
-  console.log(XdaysAgoStart.getTime(), XdaysAgoEnd.getTime());
-
+  const offsetEvents = getEventsByDateLimitGroupedByDate(XdaysAgoStart.getTime(), XdaysAgoEnd.getTime());
 
   const groupdEvents:{hour:string, events:Event[]}[] = [];
   for (let i = 0; i < 24; i++) {
@@ -180,74 +172,78 @@ router.get('/week', (req: Request, res: Response) => {
 });
 
 router.get('/retention', (req: Request, res: Response) => {
-  const dayZero:number = Number(req.query.dayZero)
-  // console.log("dayzero:", dayZero)
-  const now = new Date();
-  console.log("now", now, now.getTime());
-  const dayZeroDate = new Date(dayZero);
-  // console.log("dayZeroDate", dayZeroDate, dayZeroDate.getTime());
-  dayZeroDate.setHours(0,0,0,0);
-  console.log("dayZeroDate2", dayZeroDate, dayZeroDate.getTime());
-  const weekAfterDayZero = new Date(dayZero);
-  // console.log("weekAfterDayZero", weekAfterDayZero, weekAfterDayZero.getTime());
-  weekAfterDayZero.setDate(weekAfterDayZero.getDate() + 6);
-  // console.log("weekAfterDayZero2", weekAfterDayZero, weekAfterDayZero.getTime());
-  weekAfterDayZero.setHours(0,0,0,0);
-  console.log("weekAfterDayZero3", weekAfterDayZero.toString(), weekAfterDayZero.getTime());
-
-
   const results: weeklyRetentionObject[] = [];
 
+  let weeklyRetentionArray:number[] = [];
+  let newUsersIds:string[] = [];
+  let userIdsWhoCameBack:string[] = [];
+
   const millesecondsInAWeek = 1000*60*60*24*7;
+
+  
+  const dayZero:number = Number(req.query.dayZero)
+  
+  const dayZeroDate = new Date(dayZero);
+  dayZeroDate.setHours(3,0,0,0);
+  
+  const weekAfterDayZero = new Date(dayZeroDate);
+  weekAfterDayZero.setDate(weekAfterDayZero.getDate() + 7);
+
+  const now = new Date();
+  
   const totalWeeksToCountFrom = Math.ceil((now.getTime() - weekAfterDayZero.getTime()) / millesecondsInAWeek)
   
   while (dayZeroDate.getTime() < now.getTime()) {
-    console.log("in loop 1")
-    console.log("Day Zero", dayZeroDate);
-    console.log("week after", weekAfterDayZero)
+    newUsersIds = [];
+    weeklyRetentionArray = [];
+
     let weeksPassedFromRegistration:number = Math.ceil((now.getTime() - weekAfterDayZero.getTime()) / millesecondsInAWeek);
-    let signUpEventsThisWeek = getSpecificEventsByDateLimit(dayZeroDate.getTime(), weekAfterDayZero.getTime(), "name", "signup") 
-    let newUsersIds:string[] = [];
-    signUpEventsThisWeek.forEach((event:Event) => newUsersIds.push(event.distinct_user_id));
+    
+    
+    let newDayZero = new Date(dayZeroDate);
 
-    let newDayZero = new Date(weekAfterDayZero);
     let newWeekAfterDayZero = new Date(weekAfterDayZero);
-    console.log("new Day Zero", newDayZero);
-    console.log("new week after", newWeekAfterDayZero)
-    newWeekAfterDayZero.setDate(weekAfterDayZero.getDate() + 7);
-    console.log("new week after 2", newWeekAfterDayZero)
+    
+    
+    let signUpEventsThisWeek:Event[] = getSpecificEventsByDateLimit(newDayZero.getTime(), newWeekAfterDayZero.getTime(), "name", "signup") 
+    
+    signUpEventsThisWeek.forEach((signupEvent:Event) => newUsersIds.push(signupEvent.distinct_user_id));
 
-    const weeklyRetentionArray:number[] = [];
+    newDayZero.setDate(newDayZero.getDate()+7)
+    newWeekAfterDayZero.setDate(newWeekAfterDayZero.getDate()+7)
+
 
     while(newDayZero.getTime() < now.getTime()) {
-      console.log("in loop 2")
-      console.log("new Day Zero in loop2", newDayZero);
-      console.log("new week after in loop2", newWeekAfterDayZero)
-      let allEventsButSignup = getAllEventsButOneByDateLimit(newDayZero.getTime(), newWeekAfterDayZero.getTime(), "name", "sigunp");
-      let userIdsWhoCameBack:string[] = [];
+      userIdsWhoCameBack = [];
+      console.log(newDayZero, newWeekAfterDayZero);
       
-      allEventsButSignup.forEach((event:Event) => {
-        if(!userIdsWhoCameBack.includes(event.distinct_user_id))
-        userIdsWhoCameBack.push(event.distinct_user_id)
+      let loginEventsInThisWeek:Event[] = getSpecificEventsByDateLimit(newDayZero.getTime(), newWeekAfterDayZero.getTime(), "name", "login");
+      
+      loginEventsInThisWeek.forEach((loginEvent:Event) => {
+        if(!userIdsWhoCameBack.includes(loginEvent.distinct_user_id) && newUsersIds.includes(loginEvent.distinct_user_id))
+        userIdsWhoCameBack.push(loginEvent.distinct_user_id)
       })
-
-      let cameBackPercentages = Number((newUsersIds.length*100/userIdsWhoCameBack.length).toFixed(0))
+      
+      let cameBackPercentages = Number((userIdsWhoCameBack.length/newUsersIds.length * 100).toFixed());
       weeklyRetentionArray.push(cameBackPercentages);
 
-      newDayZero.setDate(newDayZero.getDate() + 7)
-      newWeekAfterDayZero.setDate(newWeekAfterDayZero.getDate() + 6)
+      newDayZero.setDate(newDayZero.getDate() + 7);
+      newWeekAfterDayZero.setDate(newWeekAfterDayZero.getDate() + 7);
     }
 
     results.push({
       registrationWeek: totalWeeksToCountFrom - weeksPassedFromRegistration + 1,
-      newUsers: signUpEventsThisWeek.length,
+      newUsers: newUsersIds.length,
       weeklyRetention: [100, ...weeklyRetentionArray],
       start:createDateString(dayZeroDate.getTime()),
       end:createDateString(weekAfterDayZero.getTime())
     });
 
     dayZeroDate.setDate(dayZeroDate.getDate()+7);
+    dayZeroDate.setHours(0,0,0,0)
     weekAfterDayZero.setDate(weekAfterDayZero.getDate()+7);
+    weekAfterDayZero.setHours(0,0,0,0)
+
   }
 
   res.send(results)
@@ -258,7 +254,11 @@ router.get('/:eventId',(req : Request, res : Response) => {
 });
 
 router.post('/', (req: Request, res: Response) => {
-  res.send('/')
+  const event:Event = req.body;
+
+  saveEvent(event);
+
+  res.send(event)
 });
 
 router.get('/chart/os/:time',(req: Request, res: Response) => {

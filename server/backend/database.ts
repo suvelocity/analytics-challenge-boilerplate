@@ -21,6 +21,7 @@ import {
   countBy,
   groupBy,
 } from "lodash/fp";
+import { createDateString } from './event-routes';
 import { isWithinInterval } from "date-fns";
 import low from "lowdb";
 import FileSync from "lowdb/adapters/FileSync";
@@ -198,17 +199,37 @@ export const sortEventsByDate = (events: Event[], order?:string) => events.sort(
   }
 })
 
-export const getEventsByDateLimitGroupedBySessions = (bottomLimit:number, topLimit:number) => 
+export const getEventsByDateLimitGroupedByDate = (bottomLimit:number, topLimit:number) => 
   db.get("events").filter((event:Event) => 
-    event.date > bottomLimit && event.date < topLimit).groupBy("session_id").value();
+    event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
+      return createDateString(event.date)}).value();
+
+export const getGroupdEventsByDateLimitForApi = (bottomLimit:number, topLimit:number) => {
+  const groupedEvents = getEventsGroupedByDay(bottomLimit, topLimit);
+  return Object.keys(groupedEvents).map((day:string) => {
+    return countBy((event: Event) => {
+      return createDateString(event.date);
+    }, uniqBy("session_id", groupedEvents[day]))
+  })
+}
+
+export const getEventsGroupedByDay = (bottomLimit:number, topLimit:number) => {
+  const result = db.get("events").filter((event:Event) => event.date > bottomLimit && event.date < topLimit)
+  .groupBy((event:Event) => {
+    const date = new Date(event.date);
+    return `${date.getFullYear()}/${date.getMonth()+1}/${date.getDate()}`
+  });
+  
+  return result.value()
+}
 
 export const getSpecificEventsByDateLimit = (bottomLimit:number, topLimit:number, key:string, value:any) => 
   db.get("events").filter((event:Event) => event.date > bottomLimit && event.date < topLimit)
   .filter({ [`${key}`]: value }).value();
 
-export const getAllEventsButOneByDateLimit = (bottomLimit:number, topLimit:number, key:keyof Event, value:any) =>    
-  db.get("events").filter((event:Event) => event.date > bottomLimit && event.date < topLimit)
-  .filter((event:Event) => event[key] !== `${value}`).value();
+export const saveEvent = (event: Event) => {
+    db.get(EVENT_TABLE).push(event).write();
+  };
 
 // User
 export const getUserBy = (key: string, value: any) => getBy(USER_TABLE, key, value);

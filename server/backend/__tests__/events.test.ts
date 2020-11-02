@@ -96,6 +96,7 @@ describe("main test", () => {
     expect(retentionData[4].weeklyRetention).toEqual([ 100, 44 ]);
 
   });
+  
   it("can filter events by browser", async () => {
 
     const { body: events}  = await request(app).get("/events/all-filtered")
