@@ -37,3 +37,62 @@ export function AdminValidation(req: Request, res: Response, next: NextFunction)
     });
   }
 }
+
+export function groupBy(collection: any[] , property: string) {
+  let i = 0;
+  let values = [];
+  let result = [];
+  let val;
+  let index; 
+  for (; i < collection.length; i++) {
+      val = collection[i][property];
+      index = values.indexOf(val);
+      if (index > -1)
+          result[index].push(collection[i]);
+      else {
+          values.push(val);
+          result.push([collection[i]]);
+      }
+  }
+  return result;
+}
+
+export function formatDate(date: Date) {
+  let dd = String(date.getDate()).padStart(2, "0");
+  let mm = String(date.getMonth() + 1).padStart(2, "0");
+  let yyyy = date.getFullYear();
+  return dd + "/" + mm + "/" + yyyy;
+}
+
+export function createArrayWeekAgo(offset: number) {
+  const currentDate=new Date();
+  const firstDay=new Date(currentDate.setDate(currentDate.getDate()-(6+offset)));
+  let array=[{date: formatDate(firstDay), count:0}]
+  for(let i=0;i<6;i++){
+      array.push({date: formatDate(new Date(currentDate.setDate(currentDate.getDate()+1))), count:0});
+  }
+  return({arrayOfDates: array, firstDay: firstDay});
+  
+};
+export function diffrenceInDays(date1: Date,date2: Date): number{
+  const date3=new Date(date1.toISOString().substring(0,10))
+  const date4=new Date(date2.toISOString().substring(0,10))
+  const diffTime = date4.getTime() - date3.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+  return diffDays
+}
+
+export function createArrayByHours(){
+  let array=[];
+  for(let i=0;i<24;i++){
+      if(i<10){
+          const obj={hour:`0${i}:00`,count:0}
+          array.push(obj);
+      }else{
+          const obj={hour:`${i}:00`,count:0}
+          array.push(obj);
+      }
+      }
+      return array;
+  }
+  

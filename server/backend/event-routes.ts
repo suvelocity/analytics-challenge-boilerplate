@@ -8,7 +8,7 @@ import {
   getAllEvents
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
-import { ensureAuthenticated, validateMiddleware } from "./helpers";
+import { ensureAuthenticated, validateMiddleware, groupBy, formatDate, createArrayWeekAgo, diffrenceInDays, createArrayByHours } from "./helpers";
 
 import {
   shortIdValidation,
@@ -31,6 +31,7 @@ type Location = {
   lat: number;
   lng: number;
 };
+
 
 interface event {
  _id: string;
@@ -56,22 +57,77 @@ interface Filter {
 
 router.get('/all', (req: Request, res: Response) => {
   const data: event[]= getAllEvents();
-  res.json({allEvents: data});
+  res.send(data);
     
 });
 
-router.get('/all-filtered', (req: Request, res: Response) => {
-  res.send('/all-filtered')
+router.get('/all-filtered',  (req: Request, res: Response) => {
+  const filters: Filter = req.query;
+  console.log(filters);
+  //TODO add sorting
+  const events: any[]= getAllEvents();
+  let eventsAfterFillering: event[]=[...events];
+  if(filters.type){
+      eventsAfterFillering=eventsAfterFillering.filter((event: event) => event.name === filters.type);
+  }
+  if(filters.browser){
+      eventsAfterFillering=eventsAfterFillering.filter((event: event) => event.browser === filters.browser);
+  }
+  if(filters.search){
+      console.log(filters.search);
+      
+      eventsAfterFillering=eventsAfterFillering.filter((event: any) => {
+          let ifIncludes=false;
+          for (const key in event) {
+              if(ifIncludes) return ifIncludes
+              if(typeof event[key]==="string"){
+                  ifIncludes=event.key.includes(filters.search);
+              }else if(typeof event[key]==="number"){
+                  ifIncludes=event[key].toString().includes(filters.search);
+              }
+          }
+          return ifIncludes
+      });
+  }
+  if(filters.offset){
+      eventsAfterFillering = eventsAfterFillering.slice(0, filters.offset);
+  }
+  res.json({events: eventsAfterFillering, more: !(events.length===eventsAfterFillering.length)});
 });
 
+
 router.get('/by-days/:offset', (req: Request, res: Response) => {
-  res.send('/by-days/:offset')
+  const events: event[]= getAllEvents();
+  const eventsGroupBySession: event[][]=groupBy(events,"session_id");
+  const { arrayOfDates, firstDay}=createArrayWeekAgo(parseInt(req.params.offset));
+  eventsGroupBySession.forEach(arrayByGroup => {
+      const dateOfElement=new Date(arrayByGroup[0].date)
+      const diffrenceDays: number=diffrenceInDays(firstDay,dateOfElement)
+      if(diffrenceDays>=0 &&diffrenceDays<7){
+          arrayOfDates[diffrenceDays].count++;
+      }
+  });
+  res.send(arrayOfDates);
 });
 
 router.get('/by-hours/:offset', (req: Request, res: Response) => {
-  res.send('/by-hours/:offset')
+  const events: event[]= getAllEvents();
+  let arrayByHours=createArrayByHours();
+  console.log(arrayByHours);
+  const offset=parseInt(req.params.offset);
+  const currentDate=new Date();
+  const choosenDay=new Date(currentDate.setDate(currentDate.getDate()-offset));
+  const choosenDayString=choosenDay.toISOString().substring(0,10);
+  const eventFilteredByDate: event[]=events.filter((element)=>{
+      return (new Date(element.date)).toISOString().substring(0,10)===choosenDayString
+  })
+  const eventsGroupBySession: event[][]=groupBy(eventFilteredByDate,"session_id");
+  eventsGroupBySession.forEach(arrayByGroup => {
+      const hourOfElement=new Date(arrayByGroup[0].date).getHours();     
+      arrayByHours[hourOfElement].count++;
+  });
+  res.send(arrayByHours)
 });
-
 router.get('/today', (req: Request, res: Response) => {
   res.send('/today')
 });
