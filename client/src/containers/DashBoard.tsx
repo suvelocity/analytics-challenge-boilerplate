@@ -15,9 +15,9 @@ import RetentionCohort from "../components/tiles/RetentionCohort";
 const useStyles = makeStyles((theme) => ({
   dashboard: {
     flexGrow: 1,
-    gap: "50px",
+    gap: "20px",
     marginTop: "20px",
-    maxWidth: "300vw",
+    maxWidth: "95vw",
     marginLeft: "auto",
     marginRight: "auto",
   },
@@ -25,8 +25,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     flexDirection: "column",
     boxShadow: "0.5px 0px 0.5px 2px black",
-    height: "50vh",
-    width: "80vh",
+    height: "43vh",
     minWidth: "300px",
     minHeight: "250px",
     padding: "0px",
@@ -36,8 +35,7 @@ const useStyles = makeStyles((theme) => ({
     display: "flex",
     boxShadow: "0.5px 0px 0.5px 2px black",
     height: "70vh",
-    width: "100vh",
-    minWidth: "70vw",
+    minWidth: "90vw",
     minHeight: "250px",
     padding: "0px",
   },
@@ -59,7 +57,7 @@ const DashBoard: React.FC = () => {
         <Grid container justify={"center"} spacing={10} className={classes.dashboard}>
           <ErrorBoundary>
             <Grid item className={classes.GeoTile} xs={10}>
-                <GeoTile />
+              <GeoTile />
             </Grid>
           </ErrorBoundary>
           <ErrorBoundary>
@@ -83,15 +81,15 @@ const DashBoard: React.FC = () => {
             </Grid>
           </ErrorBoundary>
           <ErrorBoundary>
+            <Grid item className={classes.GeoTile} xs={7}>
+              <RetentionCohort />
+            </Grid>
+          </ErrorBoundary>
+          <ErrorBoundary>
             <Grid item className={classes.tile} xs={7}>
               <EventLog />
             </Grid>
           </ErrorBoundary>
-          <ErrorBoundary>
-            <Grid item className={classes.GeoTile} xs={7}>
-              <RetentionCohort />
-            </Grid>
-            </ErrorBoundary>
         </Grid>
       </ErrorBoundary>
     </>

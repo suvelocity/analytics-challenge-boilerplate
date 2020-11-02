@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, PureComponent, useEffect } from "react";
 import { ResponsiveContainer, BarChart, Bar, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Brush, PieChart, Pie } from 'recharts';
 import axios from 'axios';
 
@@ -33,7 +33,6 @@ export const TimeOnURLChartBar: React.FC = () => {
     <>
             <div className="barChart">
                 <h1>Time On URL (in sec)</h1>
-                
                 <ResponsiveContainer height="77%">
                     <BarChart
 			        	data={allUsers}
@@ -77,12 +76,11 @@ export const TimeOnURLChartPie: React.FC = () => {
 		return (
             <div className="pieChart">
                 <h1>Time On URL Of All Users Average (in hours)</h1>
-                <ResponsiveContainer width="100%" height="70%">
+                <ResponsiveContainer height="70%">
 			        <PieChart>
                         <Pie data={inHours} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={50} fill="#8884d8" />
                         <Pie data={inHours} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={80} fill="#82ca9d" label />
 			        	<Tooltip />
-                <Legend />
 			        </PieChart>
                 </ResponsiveContainer>
             </div>
