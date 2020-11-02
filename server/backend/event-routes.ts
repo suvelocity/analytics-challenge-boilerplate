@@ -201,7 +201,7 @@ router.get('/retention', (req: Request, res: Response) => {
   const millesecondsInAWeek = 1000*60*60*24*7;
   const totalWeeksToCountFrom = Math.ceil((now.getTime() - weekAfterDayZero.getTime()) / millesecondsInAWeek)
   
-  while (weekAfterDayZero.getTime() < now.getTime()) {
+  while (dayZeroDate.getTime() < now.getTime()) {
     console.log("in loop 1")
     console.log("Day Zero", dayZeroDate);
     console.log("week after", weekAfterDayZero)
@@ -219,7 +219,7 @@ router.get('/retention', (req: Request, res: Response) => {
 
     const weeklyRetentionArray:number[] = [];
 
-    while(newWeekAfterDayZero.getTime() < now.getTime()) {
+    while(newDayZero.getTime() < now.getTime()) {
       console.log("in loop 2")
       console.log("new Day Zero in loop2", newDayZero);
       console.log("new week after in loop2", newWeekAfterDayZero)
