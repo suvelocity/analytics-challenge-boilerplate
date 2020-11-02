@@ -107,7 +107,7 @@ export const seedDatabase = () => {
   db.setState(testSeed).write();
   return;
 };
-
+ export const getAllEvents=()=>db.get(EVENT_TABLE).value();
 export const getAllUsers = () => db.get(USER_TABLE).value();
 
 export const getAllPublicTransactions = () =>

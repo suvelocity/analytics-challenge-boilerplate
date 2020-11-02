@@ -5,6 +5,7 @@ import { Request, Response } from "express";
 
 // some useful database functions in here:
 import {
+  getAllEvents
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -19,6 +20,32 @@ const router = express.Router();
 
 // Routes
 
+type eventName = "login" | "signup" | "admin" | "/";
+type os = "windows" | "mac" | "linux" | "ios" | "android" | "other";
+type browser = "chrome" | "safari" | "edge" | "firefox" | "ie" | "other";
+type GeoLocation = {
+  location: Location;
+  accuracy: number;
+};
+type Location = {
+  lat: number;
+  lng: number;
+};
+
+interface event {
+ _id: string;
+session_id: string;
+name: eventName;
+url: string;
+distinct_user_id: string;
+date: number; // Date.prototype.getTime()
+os: os;
+browser: browser;
+geolocation: GeoLocation;
+}
+
+
+
 interface Filter {
   sorting: string;
   type: string;
@@ -28,7 +55,8 @@ interface Filter {
 }
 
 router.get('/all', (req: Request, res: Response) => {
-  res.send('/all')
+  const data: event[]= getAllEvents();
+  res.json({allEvents: data});
     
 });
 
