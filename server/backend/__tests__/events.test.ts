@@ -91,13 +91,15 @@ describe("main test", () => {
     ).toBe(25);
   });
 
-  it.only("retention cohort", async () => {
+  it("retention cohort", async () => {
     const today = new Date(new Date().toDateString()).getTime() + 6 * OneHour;
     const dayZero = today - 5 * OneWeek;
 
     const { body: retentionData } = await request(app)
       .get(`/events/retention?dayZero=${dayZero}`)
       .expect(200);
+
+    console.log(retentionData);
 
     expect(retentionData.length).toBe(6);
 
@@ -109,11 +111,6 @@ describe("main test", () => {
     expect(retentionData[2].weeklyRetention).toEqual([100, 100, 82, 9]);
     expect(retentionData[4].newUsers).toBe(9);
     expect(retentionData[4].weeklyRetention).toEqual([100, 44]);
-
-    expect(retentionData[0].weeklyRetention).toEqual([100, 40, 60, 90, 80, 0]);
-    expect(retentionData[1].weeklyRetention).toEqual([100, 90, 60, 100, 0]);
-    expect(retentionData[2].weeklyRetention).toEqual([100, 100, 82, 9]);
-    expect(retentionData[4].newUsers).toBe(9);
   });
   it("can filter events by browser", async () => {
     const { body: events } = await request(app)

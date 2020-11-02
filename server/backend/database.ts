@@ -765,14 +765,8 @@ export const splitAndFormatSessionsByDays = (
   }
 
   return days.map((day: number) => {
-    const date = new Date(day);
     return {
-      date:
-        date.getDate().toString().padStart(2, "0") +
-        "/" +
-        (date.getMonth() + 1) +
-        "/" +
-        date.getFullYear(),
+      date: formatToStringDate(day),
       // count: events.filter((event) => RegExp(day).test(new Date(event.date).toISOString())).length,
       count: events.filter((event: Event) => inRange(day, day + alonTime.OneDay, event.date))
         .length,
@@ -821,7 +815,7 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
   const weekStartPoints: number[] = [];
   const allRegistrations = getAllEventsFiltered({ sorting: "-date", type: "signup" });
   const allEvents = getAllEvents();
-  // while (dayZero < today) weekStartPoints.push((dayZero += alonTime.OneWeek));
+
   for (let i = dayZero; i <= today; i += alonTime.OneWeek) {
     weekStartPoints.push(i);
   }
@@ -833,7 +827,6 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
       )
     ).map((uniqueUserEvent: Event) => uniqueUserEvent.distinct_user_id)
   );
-  console.log(allUniqueActiveUsersByWeeks);
   const newUsersByWeek: string[][] = weekStartPoints.map((weekStartPoint: number) =>
     allRegistrations
       .filter((registration: Event) =>
@@ -841,6 +834,7 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
       )
       .map((registration: Event) => registration.distinct_user_id)
   );
+
   return weekStartPoints.map((weekStartPoint: number, i: number) => {
     return {
       registrationWeek: i + 1,
@@ -848,7 +842,7 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
       weeklyRetention: allUniqueActiveUsersByWeeks
         .slice(i)
         .map((uniqueUsersOfWeek: string[]) =>
-          Math.floor(
+          Math.round(
             (uniqueUsersOfWeek.filter((userId: string) => newUsersByWeek[i].includes(userId))
               .length /
               newUsersByWeek[i].length) *
