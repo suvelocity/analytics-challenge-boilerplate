@@ -1,5 +1,7 @@
 ///<reference path="types.ts" />
-
+const hour = 1000 * 60 * 60;
+const day = hour * 24;
+const week = day * 7;
 import express from "express";
 import { Request, Response } from "express";
 
@@ -75,6 +77,70 @@ function getAllEvents(query?: Filter): { more: boolean; events: Event[] } | Even
   }
   return events;
 }
+function getMidnight(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0);
+}
+
+function getWeekStart(date: Date, byMonday: boolean = false): Date {
+  let ms = date.getTime();
+  let theDay = date.getDay();
+  let sunday = ms - day * theDay;
+  let monday = sunday + day;
+  return byMonday ? getMidnight(new Date(monday)) : getMidnight(new Date(sunday));
+}
+
+function getRetentionCohort(dayZero: number): weeklyRetentionObject[] {
+  dayZero = getMidnight(new Date(dayZero)).getTime();
+  let now = new Date();
+  let offsetWeeks = Math.floor((now.getTime() - Number(dayZero)) / week) + 1;
+  let events = getAllEvents({ sorting: "+date" }).events;
+  let answer: weeklyRetentionObject[] = [];
+  let test: any[] = [];
+  for (let i = 0; i < offsetWeeks; i++) {
+    answer.push({
+      registrationWeek: i,
+      newUsers: 0,
+      weeklyRetention: [],
+      start: new Date(dayZero + i * week).toLocaleDateString(),
+      end: new Date(dayZero + i * week + 7 * day).toLocaleDateString(),
+    });
+  }
+  let attendence: Array<string[]>[] = [];
+  for (let i = 0; i < offsetWeeks; i++) {
+    let arr = new Array(offsetWeeks - i).fill([]);
+    attendence.push(arr);
+  }
+
+  events.forEach((event, i) => {
+    if (event.date > dayZero) {
+      let weekNum = Math.floor((event.date - dayZero) / week);
+      if (event.name === "signup") {
+        answer[weekNum].newUsers++;
+
+        let container = [...attendence[weekNum][0]];
+        container.push(event.distinct_user_id);
+        attendence[weekNum][0] = container;
+      } else if (event.name === "login") {
+        let signupWeekIndex = attendence.findIndex((week) =>
+          week[0].includes(event.distinct_user_id)
+        );
+        if (signupWeekIndex !== -1) {
+          let container = [...attendence[signupWeekIndex][weekNum - signupWeekIndex]];
+          if (!container.includes(event.distinct_user_id)) {
+            container.push(event.distinct_user_id);
+            attendence[signupWeekIndex][weekNum - signupWeekIndex] = container;
+          }
+        }
+      }
+    }
+  });
+
+  attendence.forEach((arr, i) => {
+    let sum = arr[0].length;
+    answer[i].weeklyRetention = arr.map((week) => Math.round((week.length / sum) * 100));
+  });
+  return answer;
+}
 
 router.get("/all", (req: Request, res: Response) => {
   res.send(getAllEvents());
@@ -88,7 +154,6 @@ router.get("/by-days/:offset", (req: Request, res: Response) => {
   let offset = +req.params.offset;
   let today = Date.now();
   let answer: any = {};
-  let day = 1000 * 60 * 60 * 24;
   let start = today - offset * day;
   for (let i = 6; i >= 0; i--) {
     let date = new Date(start - i * day).toLocaleDateString();
@@ -112,21 +177,19 @@ router.get("/by-hours/:offset", (req: Request, res: Response) => {
   let offset = +req.params.offset;
   let today = new Date();
   let answer: any = {};
-  let hour = 1000 * 60 * 60;
-  let day = hour * 24;
   let events = getAllEvents();
-  let midnight = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+  let midnight = getMidnight(today);
   let elapsedSinceMidnight = today.getTime() - midnight.getTime();
   if (offset === 0) {
     for (let i = 23; i >= 0; i--) {
       answer[String(i).padStart(2, "0") + `:00`] = {};
     }
-    events.forEach(event=>{
-      if (today.getTime()-elapsedSinceMidnight<event.date){
+    events.forEach((event) => {
+      if (today.getTime() - elapsedSinceMidnight < event.date) {
         let time = String(new Date(event.date).getHours()).padStart(2, "0") + `:00`;
         answer[time][event.session_id] = 1;
       }
-    })
+    });
     // let now = today.getHours();
     // while (Object.keys(answer).length < 24) {
     //   answer[String(now).padStart(2, "0") + `:00`] = {};
@@ -156,7 +219,7 @@ router.get("/by-hours/:offset", (req: Request, res: Response) => {
       }
     });
   }
-  
+
   let result: { hour: string; count: number }[] = [];
   for (let date in answer) result.push({ hour: date, count: Object.keys(answer[date]).length });
 
@@ -173,7 +236,8 @@ router.get("/week", (req: Request, res: Response) => {
 
 router.get("/retention", (req: Request, res: Response) => {
   const { dayZero } = req.query;
-  res.send("/retention");
+
+  res.send(getRetentionCohort(Number(dayZero)));
 });
 router.get("/:eventId", (req: Request, res: Response) => {
   res.send("/:eventId");
@@ -181,7 +245,6 @@ router.get("/:eventId", (req: Request, res: Response) => {
 
 router.post("/", (req: Request, res: Response) => {
   if (req.body as Event) {
-    console.log(req.body);
     db.get("events").push(req.body).write();
   }
   res.send({ seccess: true });
