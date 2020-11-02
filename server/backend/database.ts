@@ -109,9 +109,14 @@ export const seedDatabase = () => {
 };
 
 //-------------------------------------MY CODE-------------------------------------
- import {event} from "./event-routes"
+
+import {event} from "./event-routes"
 export const getAllEvents=()=>db.get(EVENT_TABLE).value();
 
+export const getEventsUniqBySessionID = (events:event[]) => {
+  return uniqBy("session_id",events);
+  // return getBankAccountBy("id", bankaccount.id);
+};
 export const createNewEvents = (newEvent: event) => {
   db.get(EVENT_TABLE).push(newEvent).write();
   // return getBankAccountBy("id", bankaccount.id);

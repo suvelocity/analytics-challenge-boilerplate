@@ -6,9 +6,10 @@ import { Request, Response } from "express";
 // some useful database functions in here:
 import {
   getAllEvents,
-  createNewEvents
+  createNewEvents,
+  getEventsUniqBySessionID
 } from "./database";
-import { Event, weeklyRetentionObject } from "../../client/src/models/event";
+// import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware, groupBy, formatDate, createArrayWeekAgo, diffrenceInDays, createArrayByHours } from "./helpers";
 
 import {
@@ -35,15 +36,15 @@ type Location = {
 
 
 export interface event {
- _id: string;
-session_id: string;
-name: eventName;
-url: string;
-distinct_user_id: string;
-date: number; // Date.prototype.getTime()
-os: os;
-browser: browser;
-geolocation: GeoLocation;
+  _id: string;
+  session_id: string;
+  name: eventName;
+  url: string;
+  distinct_user_id: string;
+  date: number; // Date.prototype.getTime()
+  os: os;
+  browser: browser;
+  geolocation: GeoLocation;
 }
 
 
@@ -64,7 +65,6 @@ router.get('/all', (req: Request, res: Response) => {
 
 router.get('/all-filtered',  (req: Request, res: Response) => {
   const filters: Filter = req.query;
-  console.log(filters);
   const events: any[]= getAllEvents();
   let eventsAfterFillering: event[]=[...events];
   if(filters.sorting==="+date"){
@@ -104,10 +104,10 @@ router.get('/all-filtered',  (req: Request, res: Response) => {
 
 router.get('/by-days/:offset', (req: Request, res: Response) => {
   const events: event[]= getAllEvents();
-  const eventsGroupBySession: event[][]=groupBy(events,"session_id");
+  const eventsGroupBySession: event[]= getEventsUniqBySessionID(events);
   const { arrayOfDates, firstDay}=createArrayWeekAgo(parseInt(req.params.offset));
   eventsGroupBySession.forEach(arrayByGroup => {
-      const dateOfElement=new Date(arrayByGroup[0].date)
+      const dateOfElement=new Date(arrayByGroup.date)
       const diffrenceDays: number=diffrenceInDays(firstDay,dateOfElement)
       if(diffrenceDays>=0 &&diffrenceDays<7){
           arrayOfDates[diffrenceDays].count++;
@@ -116,10 +116,12 @@ router.get('/by-days/:offset', (req: Request, res: Response) => {
   res.send(arrayOfDates);
 });
 
+
+
+
 router.get('/by-hours/:offset', (req: Request, res: Response) => {
   const events: event[]= getAllEvents();
   let arrayByHours=createArrayByHours();
-  console.log(arrayByHours);
   const offset=parseInt(req.params.offset);
   const currentDate=new Date();
   const choosenDay=new Date(currentDate.setDate(currentDate.getDate()-offset));
@@ -127,9 +129,9 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
   const eventFilteredByDate: event[]=events.filter((element)=>{
       return (new Date(element.date)).toISOString().substring(0,10)===choosenDayString
   })
-  const eventsGroupBySession: event[][]=groupBy(eventFilteredByDate,"session_id");
+  const eventsGroupBySession: event[]= getEventsUniqBySessionID(eventFilteredByDate);
   eventsGroupBySession.forEach(arrayByGroup => {
-      const hourOfElement=new Date(arrayByGroup[0].date).getHours();     
+      const hourOfElement=new Date(arrayByGroup.date).getHours();     
       arrayByHours[hourOfElement].count++;
   });
   res.send(arrayByHours)
@@ -146,10 +148,34 @@ router.get('/by-hours/:offset', (req: Request, res: Response) => {
 //   res.send('/week')
 // });
 
-// router.get('/retention', (req: Request, res: Response) => {
-//   const {dayZero} = req.query
-//   res.send('/retention')
-// });
+
+interface weeklyRetentionObject {
+  registrationWeek:number;  //launch is week 0 and so on
+  newUsers:number;  // how many new user have joined this week
+  weeklyRetention:number[]; // for every week since, what percentage of the users came back. weeklyRetention[0] is always 100% because it's the week of registration  
+  start:string;  //date string for the first day of the week
+  end:string  //date string for the first day of the week
+}
+let week0Retention : weeklyRetentionObject = {
+  registrationWeek: 1, 
+  newUsers: 34, 
+  weeklyRetention:[100,24,45,66,1,80],  // here we see there were 7 in total since week 1 has data for 6 weeks 
+  start:'01/11/2020',
+  end: '07/11/2020'
+} 
+
+// function getRetentionCohort(dayZero:number) : weeklyRetentionObject[] {
+
+// }
+
+
+router.get('/retention', (req: Request, res: Response) => {
+  const {dayZero} = req.query
+  const firstDay=new Date(dayZero)
+  const firstDayForLast=new Date(dayZero)
+  const lastDay=new Date(firstDayForLast.setDate(firstDayForLast.getDate()+7))
+  res.send('/retention')
+});
 // router.get('/:eventId',(req : Request, res : Response) => {
 //   res.send('/:eventId')
 // });

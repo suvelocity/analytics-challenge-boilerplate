@@ -49,8 +49,9 @@ describe("main test", () => {
     const { body: sessionsByDays } = await request(app).get("/events/by-days/0").expect(200)
 
     expect(sessionsByDays.length).toBe(7)
-    expect(sessionsByDays.reduce((sum: number, day: {date: string; count: number}) => sum += day.count, 0)).toBe(145
-      )
+
+    
+    expect(sessionsByDays.reduce((sum: number, day: {date: string; count: number}) => sum += day.count, 0)).toBe(145)
     expect(sessionsByDays[0].count).toBe(19);
 
     const { body: sessionsByDays2 } = await request(app).get("/events/by-days/7").expect(200)
@@ -64,7 +65,7 @@ describe("main test", () => {
 
   it("can get unique sessions count by hour", async () => {
     const { body: sessionsByHours } = await request(app).get("/events/by-hours/0").expect(200)
-
+    console.log(sessionsByHours);
     expect(sessionsByHours.length).toBe(24)
     expect(sessionsByHours.reduce((sum: number, day: {date: string; count: number}) => sum += day.count, 0)).toBe(7)
 
@@ -77,6 +78,7 @@ describe("main test", () => {
   it("retention cohort", async () => {
     const today = new Date (new Date().toDateString()).getTime()+6*OneHour
     const dayZero = today-5*OneWeek
+    console.log(dayZero);
 
     const { body: retentionData } = await request(app).get(
       `/events/retention?dayZero=${dayZero}`
