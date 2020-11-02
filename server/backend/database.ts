@@ -701,7 +701,7 @@ const saveComment = (comment: Comment): Comment => {
 
 // Events
 interface Filter {
-  sorting: string;
+  sorting: "+date" | "-date";
   type?: string;
   browser?: string;
   search?: string;

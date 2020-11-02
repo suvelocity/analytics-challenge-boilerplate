@@ -28,7 +28,7 @@ const router = express.Router();
 // Routes
 
 interface Filter {
-  sorting: string;
+  sorting: "+date" | "-date";
   type?: string;
   browser?: string;
   search?: string;
@@ -66,7 +66,7 @@ router.get("/by-days/:offset", (req: Request, res: Response) => {
   const startDate: number = endDate - alonTime.OneDay * 6;
 
   const byDays = getSessionsByDayInWeek(startDate, endDate);
-
+  console.log(byDays);
   res.json(byDays);
 });
 
