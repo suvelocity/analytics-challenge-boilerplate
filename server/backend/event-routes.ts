@@ -4,9 +4,15 @@ import express from "express";
 import { Request, Response } from "express";
 
 // some useful database functions in here:
-import { getAllEvents, getAllEventsFiltered } from "./database";
+import {
+  getAllEvents,
+  getAllEventsFiltered,
+  getSessionsByDayInWeek,
+  getSessionsByHoursInDay,
+} from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
+import * as alonTime from "./timeFrames";
 
 import {
   shortIdValidation,
@@ -27,19 +33,19 @@ interface Filter {
   offset?: number;
 }
 
-//passing tests - DO NOT TOUCH
+//passing test - DO NOT TOUCH
 router.get("/all", (req: Request, res: Response) => {
   const events = getAllEvents();
   res.json(events);
 });
 
-// for now returns all events filtered from earliest to latest
+//passing test - DO NOT TOUCH
 router.get("/all-filtered", (req: Request, res: Response) => {
   const filter: Filter = req.query;
-  console.log(filter);
+
   const offset: number = filter?.offset ? filter.offset : 10000000000;
   const filtered = getAllEventsFiltered(filter);
-  // console.log(filtered.slice(0, 5));
+
   res.json({
     events: filtered
       // .map((event) => {
@@ -51,12 +57,25 @@ router.get("/all-filtered", (req: Request, res: Response) => {
   });
 });
 
+//passing test - DO NOT TOUCH
 router.get("/by-days/:offset", (req: Request, res: Response) => {
-  res.send("/by-days/:offset");
+  const { offset } = req.params;
+  const endDate: number = new Date().setHours(0, 0, 0) - parseInt(offset) * alonTime.OneDay;
+  const startDate: number = endDate - alonTime.OneDay * 6;
+
+  const byDays = getSessionsByDayInWeek(startDate, endDate);
+  console.log(byDays);
+  res.json(byDays);
 });
 
+//passing test - DO NOT TOUCH
 router.get("/by-hours/:offset", (req: Request, res: Response) => {
-  res.send("/by-hours/:offset");
+  const { offset } = req.params;
+  const startDate = new Date().setHours(0, 0, 0) - parseInt(offset) * alonTime.OneDay;
+
+  const byHours = getSessionsByHoursInDay(startDate);
+  console.log(byHours);
+  res.json(byHours);
 });
 
 router.get("/today", (req: Request, res: Response) => {

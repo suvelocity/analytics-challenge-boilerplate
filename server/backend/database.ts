@@ -69,6 +69,9 @@ import {
   isCommentNotification,
 } from "../../client/src/utils/transactionUtils";
 import { DbSchema } from "../../client/src/models/db-schema";
+import * as alonTime from "./timeFrames";
+import { start } from "repl";
+import { date } from "faker";
 
 export type TDatabase = {
   users: User[];
@@ -727,6 +730,90 @@ export const getAllEventsFiltered = (filter: Filter): Event[] => {
   return allEventsfiltered;
 };
 
+export const getAllUniqueSessionsInRange = (
+  endDate: number,
+  startDate: number,
+  interval: number
+): Event[] => {
+  const allEvents = getAllEvents();
+  const intervals = [startDate];
+  while (endDate > startDate) intervals.push((startDate += interval));
+  console.log(intervals);
+  const b = intervals.flatMap((inter) =>
+    uniqBy(
+      "session_id",
+      allEvents.filter((event: Event) => inRange(inter, inter + interval, event.date))
+    )
+  );
+  console.log(b.length);
+  return b;
+};
+
+export const splitAndFormatSessionsByDays = (
+  events: Event[],
+  lastDay: number,
+  numberOfDays: number
+) => {
+  // const days: string[] = [];
+  // for (let i = 0; i < numberOfDays; i++) {
+  //   days.push(new Date(lastDay - alonTime.OneDay * i).toISOString().slice(0, 10));
+  // }
+  const days: number[] = [];
+  for (let i = 0; i < numberOfDays; i++) {
+    days.push(lastDay - i * alonTime.OneDay);
+  }
+
+  return days.map((day: number) => {
+    const date = new Date(day);
+    return {
+      date:
+        date.getDate().toString().padStart(2, "0") +
+        "/" +
+        (date.getMonth() + 1) +
+        "/" +
+        date.getFullYear(),
+      // count: events.filter((event) => RegExp(day).test(new Date(event.date).toISOString())).length,
+      count: events.filter((event: Event) => inRange(day, day + alonTime.OneDay, event.date))
+        .length,
+    };
+  });
+};
+
+export const splitAndFormatSessionsByHours = (
+  sessions: Event[],
+  firstHour: number,
+  numberOfHours: number
+) => {
+  const hours: number[] = [];
+  for (let i = 0; i < numberOfHours; i++) {
+    hours.push(firstHour + i * alonTime.OneHour);
+  }
+
+  return hours.map((hour: number) => {
+    return {
+      hour: new Date(hour).getHours().toString().padStart(2, "0") + ":00",
+      count: sessions.filter((session: Event) =>
+        inRange(hour, hour + alonTime.OneHour, session.date)
+      ).length,
+    };
+  });
+};
+
+export const getSessionsByDayInWeek = (startDate: number, endDate: number) => {
+  return splitAndFormatSessionsByDays(
+    getAllUniqueSessionsInRange(endDate, startDate, alonTime.OneDay),
+    endDate,
+    7
+  ).reverse();
+};
+
+export const getSessionsByHoursInDay = (startDate: number) => {
+  return splitAndFormatSessionsByHours(
+    getAllUniqueSessionsInRange(startDate + alonTime.OneHour * 23, startDate, alonTime.OneHour),
+    startDate,
+    24
+  );
+};
 // Notifications
 
 export const getNotificationBy = (key: string, value: any): NotificationType =>
