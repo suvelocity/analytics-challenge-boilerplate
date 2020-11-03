@@ -5,10 +5,7 @@ import { ThemeContext } from "styled-components";
 import { httpClient } from "utils/asyncUtils";
 import { nowString, todayMs, oneDayMs } from "../utils/timeUtils";
 
-interface props {
-  className: string;
-}
-const SessionsByHoursChart: React.FC<props> = ({ className }) => {
+const SessionsByHoursChart: React.FC = () => {
   const [data, setData] = useState();
   const [offset, setOffset] = useState(0);
   const dateFieldRef = createRef<HTMLInputElement>();
@@ -45,7 +42,7 @@ const SessionsByHoursChart: React.FC<props> = ({ className }) => {
         onChange={handleDatePick}
         ref={dateFieldRef}
       />
-      <ResponsiveContainer width={"100%"} height={"100%"} className={className}>
+      <ResponsiveContainer width={"100%"} height={"100%"}>
         <LineChart
           data={data}
           style={{ backgroundColor: themeContext.chart.background, fontSize: "12px" }}

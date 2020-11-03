@@ -50,6 +50,7 @@ import {
   TransactionQueryPayload,
   DefaultPrivacyLevel,
   Event,
+  Filter,
   weeklyRetentionObject,
 } from "../../client/src/models";
 import Fuse from "fuse.js";
@@ -700,13 +701,6 @@ const saveComment = (comment: Comment): Comment => {
 };
 
 // Events
-interface Filter {
-  sorting: "+date" | "-date";
-  type?: string;
-  browser?: string;
-  search?: string;
-  offset?: number;
-}
 export const getAllEvents = () => db.get(EVENT_TABLE).value();
 
 export const getAllEventsFiltered = (filter: Filter): Event[] => {
@@ -716,15 +710,16 @@ export const getAllEventsFiltered = (filter: Filter): Event[] => {
     (prev: Event, cur: Event) => (prev.date - cur.date) * dateDirection
   );
 
-  if (!filter?.browser && !filter?.search && !filter?.type) return allEventsSorted;
+  if (!filter?.browser && !filter?.search && !filter?.type && !filter.os) return allEventsSorted;
 
   const filterEvents = (event: Event, index: number, array: Event[]): boolean => {
     const typeIsOkay: boolean = filter?.type ? event.name === filter.type : true;
     const browserIsOkay: boolean = filter?.browser ? event.browser === filter.browser : true;
+    const osIsOkay: boolean = filter?.os ? event.os === filter.os : true;
     const searchIsOkay: boolean = filter?.search
       ? Object.values(event).some((value) => RegExp(`${filter.search}`).test(value))
       : true;
-    return typeIsOkay && browserIsOkay && searchIsOkay;
+    return typeIsOkay && browserIsOkay && searchIsOkay && osIsOkay;
   };
   // filter events:
   const allEventsfiltered = allEventsSorted.filter(filterEvents);

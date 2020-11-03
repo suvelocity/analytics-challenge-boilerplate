@@ -35,17 +35,17 @@ export const ChartsLayout = styled.div`
     color: ${(props) => props.theme.body.text}; */
     /* grid-area: chart2; */
   }
-  .chart3 {
-    width: 100%;
-    height: 100%;
-    background-color: cyan;
-    grid-area: chart3;
+  #chart3 {
+    width: 25%;
+    height: 40vh;
+    /* background-color: cyan;
+    grid-area: chart3; */
   }
   .chart4 {
     width: 100%;
     height: 100%;
-    background-color: green;
-    grid-area: chart4;
+    /* background-color: green;
+    grid-area: chart4; */
   }
   .chart5 {
     width: 100%;

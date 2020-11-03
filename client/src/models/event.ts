@@ -10,12 +10,27 @@ export interface Event {
   geolocation: GeoLocation;
 }
 
+export interface Filter {
+  sorting?: "+date" | "-date";
+  type?: eventName;
+  os?: os;
+  browser?: browser;
+  search?: string;
+  offset?: number;
+}
+
 export interface weeklyRetentionObject {
-  registrationWeek:number;
-  newUsers:number;
-  weeklyRetention:number[];
-  start:string;
-  end:string
+  registrationWeek: number;
+  newUsers: number;
+  weeklyRetention: number[];
+  start: string;
+  end: string;
+}
+
+export interface pieChartResponseObject {
+  title: os | eventName;
+  value: number;
+  color?: string;
 }
 
 export type eventName = "login" | "signup" | "admin" | "/";

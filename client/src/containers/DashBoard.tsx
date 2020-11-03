@@ -7,6 +7,7 @@ import { useDarkMode } from "utils/useDarkMode";
 import { darkTheme, lightTheme } from "utils/themes";
 import SessionsByDaysChart from "components/SessionsByDaysChart";
 import SessionsByHoursChart from "components/SessionsByHoursChart";
+import GenericPieChart from "components/PieChart";
 export interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
@@ -30,11 +31,17 @@ const DashBoard: React.FC = () => {
       <ThemeProvider theme={currentStyle}>
         <ChartsLayout>
           <div id="chart1">
-            <SessionsByHoursChart className="chart1" />
+            <SessionsByHoursChart />
           </div>
           <div id="chart2">
             <SessionsByDaysChart />
             {/* <SessionsByHoursChart className="chart2" /> */}
+          </div>
+          <div id="chart3">
+            <GenericPieChart filter="os" />
+          </div>
+          <div id="chart3">
+            <GenericPieChart filter="pageView" />
           </div>
           {/* <div className="chart1">a</div>
           <div className="chart2">a</div>

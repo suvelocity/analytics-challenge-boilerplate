@@ -12,7 +12,14 @@ import {
   getSessionsByHoursInDay,
   saveNewEvent,
 } from "./database";
-import { Event, weeklyRetentionObject } from "../../client/src/models/event";
+import {
+  Event,
+  Filter,
+  os,
+  eventName,
+  weeklyRetentionObject,
+  pieChartResponseObject,
+} from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
 import * as alonTime from "./timeFrames";
 
@@ -22,18 +29,9 @@ import {
   userFieldsValidator,
   isUserValidator,
 } from "./validators";
-import { date } from "faker";
 const router = express.Router();
 
 // Routes
-
-interface Filter {
-  sorting: "+date" | "-date";
-  type?: string;
-  browser?: string;
-  search?: string;
-  offset?: number;
-}
 
 //passing test - DO NOT TOUCH
 router.get("/all", (req: Request, res: Response) => {
@@ -90,9 +88,10 @@ router.get("/week", (req: Request, res: Response) => {
 
 router.get("/retention", (req: Request, res: Response) => {
   const dayZero = new Date(parseInt(req.query.dayZero)).setHours(0, 0, 0, 0);
-  const retention = getRetentionFromDayZero(dayZero);
+  const retention: weeklyRetentionObject[] = getRetentionFromDayZero(dayZero);
   res.json(retention);
 });
+
 router.get("/:eventId", (req: Request, res: Response) => {
   res.send("/:eventId");
 });
@@ -104,12 +103,23 @@ router.post("/", (req: Request, res: Response) => {
   res.sendStatus(200);
 });
 
-router.get("/chart/os/:time", (req: Request, res: Response) => {
-  res.send("/chart/os/:time");
+router.get("/chart/os", (req: Request, res: Response) => {
+  const operatingSystems: os[] = ["windows", "mac", "linux", "ios", "android", "other"];
+  const data: pieChartResponseObject[] = operatingSystems.map((os: os) => {
+    return { title: os, value: getAllEventsFiltered({ os: os }).length };
+  });
+
+  res.json(data);
 });
 
-router.get("/chart/pageview/:time", (req: Request, res: Response) => {
-  res.send("/chart/pageview/:time");
+router.get("/chart/pageview", (req: Request, res: Response) => {
+  const pages: eventName[] = ["login", "signup", "admin", "/"];
+  const data: pieChartResponseObject[] = pages.map((page: eventName) => {
+    const count = getAllEventsFiltered({ type: page }).length;
+    return { title: page, value: count === 0 ? 2 : count };
+  });
+
+  res.json(data);
 });
 
 router.get("/chart/timeonurl/:time", (req: Request, res: Response) => {
