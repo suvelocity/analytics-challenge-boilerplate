@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 import { getUserById } from "./database";
 import {event} from "./event-routes"
+
 interface weeklyRetentionObject {
   registrationWeek:number;  //launch is week 0 and so on
   newUsers:number;  // how many new user have joined this week
