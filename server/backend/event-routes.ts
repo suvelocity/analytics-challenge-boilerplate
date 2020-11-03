@@ -28,6 +28,7 @@ const router = express.Router();
 // Routes
 
 export interface Filter {
+  [key: string]: string | number;
   sorting: string;
   type: string;
   browser: string;
