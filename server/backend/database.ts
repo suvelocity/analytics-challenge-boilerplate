@@ -829,7 +829,12 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
       )
       .map((registration: Event) => registration.distinct_user_id)
   );
-
+  //override empty arrays of 'dead weeks' to prevent null returning and instead return 0
+  newUsersByWeek.forEach((usersArr: string[]) => {
+    if (usersArr.length === 0) usersArr.push("none");
+  });
+  console.log(newUsersByWeek[0]);
+  console.log(allUniqueActiveUsersByWeeks[0]);
   return weekStartPoints.map((weekStartPoint: number, i: number) => {
     return {
       registrationWeek: i + 1,
@@ -845,7 +850,7 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
           )
         ),
       start: formatToStringDate(weekStartPoint),
-      end: formatToStringDate(weekStartPoint + alonTime.OneWeek),
+      end: formatToStringDate(weekStartPoint + alonTime.OneWeek - alonTime.OneDay),
     };
   });
 };
