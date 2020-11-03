@@ -65,7 +65,6 @@ const EventsLog: React.FC<{}> = ({}) => {
 
     const onSubmit = (data:Filter) => {
       setFilters(data);
-      console.log(data)
     };
 
     useEffect( () => {
@@ -80,7 +79,6 @@ const EventsLog: React.FC<{}> = ({}) => {
         });
 
         const events = data;
-        console.log(events);
         setAllEvents(events);
     };
 
@@ -98,7 +96,6 @@ const EventsLog: React.FC<{}> = ({}) => {
       }
 
       const queryString:string = queryArray.join("&")
-      console.log(queryString);
       return queryString
     }
       

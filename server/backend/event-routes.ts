@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 
 // some useful database functions in here:
 import {
-  getAllEvents, getEventsGroupedByDay, getSpecificEventsByDateLimit, sortEventsByDate, getGroupdEventsByDateLimitForApi, getEventsByDateLimitGroupedByDate, saveEvent
+  getAllEvents, getEventsGroupedByDay, getSpecificEventsByDateLimit, sortEventsByDate, getGroupdEventsByDateLimitForApi, getEventsByDateLimitGroupedByDate, saveEvent, getGroupdEventsByOsByDateLimit
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -217,7 +217,6 @@ router.get('/retention', (req: Request, res: Response) => {
 
     while(newDayZero.getTime() < now.getTime()) {
       userIdsWhoCameBack = [];
-      console.log(newDayZero, newWeekAfterDayZero);
       
       let loginEventsInThisWeek:Event[] = getSpecificEventsByDateLimit(newDayZero.getTime(), newWeekAfterDayZero.getTime(), "name", "login");
       
@@ -264,7 +263,19 @@ router.post('/', (req: Request, res: Response) => {
 });
 
 router.get('/chart/os/:time',(req: Request, res: Response) => {
-  res.send('/chart/os/:time')
+  const now = Date.now();
+  const timeToStart:number = Number(req.params.time);
+
+  const events = getGroupdEventsByOsByDateLimit(timeToStart, now)
+
+  const allOs = events.map(event => Object.keys(event));
+  const counts = events.map(event => Object.values(event));
+
+  const results:{os:string, count:number}[] = events.map((groupedEvent, i) => {
+    return {os: allOs[i][0], count:counts[i][0]}
+  }) 
+
+  res.send(results);
 })
 
 router.get('/chart/pageview/:time',(req: Request, res: Response) => {

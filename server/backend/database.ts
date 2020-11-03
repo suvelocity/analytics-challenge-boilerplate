@@ -199,6 +199,11 @@ export const sortEventsByDate = (events: Event[], order?:string) => events.sort(
   }
 })
 
+export const getEventsByDateLimitGroupesByOs = (bottomLimit:number, topLimit:number) =>
+  db.get("events").filter((event:Event) => 
+    event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
+      return event.os}).value();
+
 export const getEventsByDateLimitGroupedByDate = (bottomLimit:number, topLimit:number) => 
   db.get("events").filter((event:Event) => 
     event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
@@ -210,6 +215,15 @@ export const getGroupdEventsByDateLimitForApi = (bottomLimit:number, topLimit:nu
     return countBy((event: Event) => {
       return new Date(event.date).toLocaleString().split(', ')[0];
     }, uniqBy("session_id", groupedEvents[day]))
+  })
+}
+
+export const getGroupdEventsByOsByDateLimit = (bottomLimit:number, topLimit:number) => {
+  const groupedEvents = getEventsByDateLimitGroupesByOs(bottomLimit, topLimit);
+  return Object.keys(groupedEvents).map((os:string) => {
+    return countBy((event: Event) => {
+      return event.os
+    }, uniqBy("_id", groupedEvents[os]))
   })
 }
 

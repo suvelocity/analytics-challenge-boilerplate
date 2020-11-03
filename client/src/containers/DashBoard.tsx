@@ -9,7 +9,8 @@ import SessionByDays from "components/dashboard components/SessionByDays";
 import SessionByHours from "components/dashboard components/SessionByHours";
 import EventsLog from "components/dashboard components/EventsLog";
 import RetentionLog from "components/dashboard components/RetentionLog";
-import { AdminCard } from "components/styled components/cohort.styles";
+import { AdminCard, ChartWrapper } from "components/styled components/cohort.styles";
+import EventsByOs from "components/dashboard components/EventByOs";
 
 
 
@@ -53,6 +54,9 @@ const DashBoard: React.FC = () => {
           </ErrorBoundary>
           <ErrorBoundary>
             <RetentionLog/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <EventsByOs/>
           </ErrorBoundary>
       </AdminCard>
     </>

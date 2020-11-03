@@ -65,7 +65,6 @@ const RetentionLog: React.FC<{}> = ({}) => {
         });
 
         const retentions = data;
-        console.log(retentions);
         setAllRetentions(retentions);
     };
       
