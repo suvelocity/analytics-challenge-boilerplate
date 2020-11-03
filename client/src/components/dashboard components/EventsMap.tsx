@@ -62,7 +62,7 @@ const EventsMap: React.FC<{}> = ({}) => {
                             }
                         }
                         />
-                        ))
+                    ))
 
                        : <h1>Loader</h1>
                 }

@@ -7,6 +7,7 @@ import EventsMap from '../components/dashboard components/EventsMap'
 import ErrorBoundary from '../containers/ErrorBoundaries'
 import SessionByDays from "components/dashboard components/SessionByDays";
 import SessionByHours from "components/dashboard components/SessionByHours";
+import EventsLog from "components/dashboard components/EventsLog";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -52,6 +53,9 @@ const DashBoard: React.FC = () => {
         </ErrorBoundary>
         <ErrorBoundary>
           <SessionByHours/>
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <EventsLog/>
         </ErrorBoundary>
       </Box>
       </Paper>
