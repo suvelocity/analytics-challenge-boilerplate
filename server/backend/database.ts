@@ -208,7 +208,7 @@ export const getGroupdEventsByDateLimitForApi = (bottomLimit:number, topLimit:nu
   const groupedEvents = getEventsGroupedByDay(bottomLimit, topLimit);
   return Object.keys(groupedEvents).map((day:string) => {
     return countBy((event: Event) => {
-      return createDateString(event.date);
+      return new Date(event.date).toLocaleString().split(', ')[0];
     }, uniqBy("session_id", groupedEvents[day]))
   })
 }

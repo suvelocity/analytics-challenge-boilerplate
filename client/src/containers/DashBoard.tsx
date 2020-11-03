@@ -5,11 +5,13 @@ import { makeStyles, Paper, Typography, Box } from "@material-ui/core";
 import grey from "@material-ui/core/colors/grey";
 import EventsMap from '../components/dashboard components/EventsMap'
 import ErrorBoundary from '../containers/ErrorBoundaries'
+import SessionByDays from "components/dashboard components/SessionByDays";
 
 
 const useStyles = makeStyles((theme) => ({
   paper: {
     minHeight: "90vh",
+    // minWidth: "70vw",
     padding: theme.spacing(2),
     display: "flex",
     overflow: "auto",
@@ -43,6 +45,9 @@ const DashBoard: React.FC = () => {
       >
         <ErrorBoundary>
           <EventsMap/>
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SessionByDays/>
         </ErrorBoundary>
       </Box>
       </Paper>

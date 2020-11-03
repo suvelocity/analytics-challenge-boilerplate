@@ -101,22 +101,23 @@ router.get('/by-days/:offset', (req: Request, res: Response) => {
   const oneWeekAndXdaysAgo = new Date();
   oneWeekAndXdaysAgo.setDate(now.getDate() - XdaysToCountBack - 6);
   oneWeekAndXdaysAgo.setHours(0,0,0,0);
-  console.log(oneWeekAndXdaysAgo)
 
   const XdaysAgo = new Date(oneWeekAndXdaysAgo);
   XdaysAgo.setDate(oneWeekAndXdaysAgo.getDate() + 7);
   XdaysAgo.setHours(oneWeekAndXdaysAgo.getHours());
-  console.log(XdaysAgo)
 
   const groupdEvents = getGroupdEventsByDateLimitForApi(oneWeekAndXdaysAgo.getTime(), XdaysAgo.getTime());
 
   const dates = groupdEvents.map(groupedEvent => Object.keys(groupedEvent));
   const values = groupdEvents.map(groupedEvent => Object.values(groupedEvent));
 
-  const results:object[] = groupdEvents.map((groupedEvent, i) => {
+  const results:{date:string, count:number}[] = groupdEvents.map((groupedEvent, i) => {
     return {date: dates[i][0], count:values[i][0]}
   }) 
 
+  results.sort((dateA, dateB) => {     
+    return new Date(dateA.date).getTime() - new Date(dateB.date).getTime()
+})
 
   res.send(results)
 });

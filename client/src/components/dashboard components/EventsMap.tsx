@@ -41,27 +41,32 @@ const EventsMap: React.FC<{}> = ({}) => {
               }
               mapContainerStyle={mapContainerStyle}
               center={defaultCenter}
-              zoom={1.5}
+              zoom={1}
             >
             {/* <div> */}
-                {/* <MarkerClusterer
+                <MarkerClusterer
                     // onClick={props.onMarkerClustererClick}
                     averageCenter
                     enableRetinaIcons
                     gridSize={60}
-                > */}
-                    {allEvents?.map(event => (
-                            <Marker
-                                key={event._id} 
-                                position={
-                                    {  
-                                        lat: event.geolocation.location.lat, 
-                                        lng: event.geolocation.location.lng
-                                    }
-                                }
-                            />
-                    ))}
-                {/* </MarkerClusterer> */}
+                >
+                { 
+                    (clusterer) => allEvents ? allEvents.map(event => (
+                        <Marker
+                        key={event._id} 
+                        clusterer={clusterer}
+                        position={
+                            {  
+                                lat: event.geolocation.location.lat, 
+                                lng: event.geolocation.location.lng
+                            }
+                        }
+                        />
+                        ))
+
+                       : <h1>Loader</h1>
+                }
+                </MarkerClusterer>
             {/* </div> */}
             </GoogleMap>
         </LoadScript>
