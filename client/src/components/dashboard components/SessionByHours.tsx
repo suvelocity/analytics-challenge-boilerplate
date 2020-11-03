@@ -4,7 +4,7 @@ import axios from 'axios'
 import { LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, Legend } from 'recharts'
 import { TextField } from "@material-ui/core";
 
-const SessionByDays: React.FC<{}> = ({}) => {
+const SessionByHours: React.FC<{}> = ({}) => {
     const [allSessions, setAllSessions] = useState<object[]>();
     const [offset, setOffset] = useState<number>(0);
 
@@ -15,14 +15,13 @@ const SessionByDays: React.FC<{}> = ({}) => {
     const fetchSessions: (offset:number) => Promise<void> = async () => {
         const { data } = await axios({
           method: "get",
-          url: `http://localhost:3001/events/by-days/${offset}`,
+          url: `http://localhost:3001/events/by-hours/${offset}`,
         });
         const sessions = data;
         setAllSessions(sessions);
       };
 
     const getDateDifferences = (dateToStart:string):number => {
-
       if (new Date(dateToStart).getTime() < Date.now()) {
         return  Number(((Date.now() - new Date(dateToStart).getTime()) / (1000*60*60*24)).toFixed())
       } else return 0
@@ -38,7 +37,7 @@ const SessionByDays: React.FC<{}> = ({}) => {
       <div>
         <TextField
           id="offset"
-          label="start date"
+          label="date"
           type="date"
           onChange={(e)=>{onEventChange(e.target.value)}}
           // className={classes.textField}
@@ -49,7 +48,7 @@ const SessionByDays: React.FC<{}> = ({}) => {
         <LineChart width={730} height={250} data={allSessions}
         margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
+        <XAxis dataKey="hour" />
         <YAxis />
         <Tooltip />
         <Legend />
@@ -62,4 +61,4 @@ const SessionByDays: React.FC<{}> = ({}) => {
   );
 };
 
-export default SessionByDays;
+export default SessionByHours;

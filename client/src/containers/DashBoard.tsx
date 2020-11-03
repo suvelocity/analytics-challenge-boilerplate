@@ -6,6 +6,7 @@ import grey from "@material-ui/core/colors/grey";
 import EventsMap from '../components/dashboard components/EventsMap'
 import ErrorBoundary from '../containers/ErrorBoundaries'
 import SessionByDays from "components/dashboard components/SessionByDays";
+import SessionByHours from "components/dashboard components/SessionByHours";
 
 
 const useStyles = makeStyles((theme) => ({
@@ -48,6 +49,9 @@ const DashBoard: React.FC = () => {
         </ErrorBoundary>
         <ErrorBoundary>
           <SessionByDays/>
+        </ErrorBoundary>
+        <ErrorBoundary>
+          <SessionByHours/>
         </ErrorBoundary>
       </Box>
       </Paper>
