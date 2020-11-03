@@ -833,8 +833,7 @@ export const getRetentionFromDayZero = (dayZero: number): weeklyRetentionObject[
   newUsersByWeek.forEach((usersArr: string[]) => {
     if (usersArr.length === 0) usersArr.push("none");
   });
-  console.log(newUsersByWeek[0]);
-  console.log(allUniqueActiveUsersByWeeks[0]);
+
   return weekStartPoints.map((weekStartPoint: number, i: number) => {
     return {
       registrationWeek: i + 1,

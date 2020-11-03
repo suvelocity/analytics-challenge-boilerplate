@@ -16,6 +16,7 @@ export interface Filter {
   os?: os;
   browser?: browser;
   search?: string;
+  pageNumber?: number;
   offset?: number;
 }
 
@@ -31,6 +32,11 @@ export interface pieChartResponseObject {
   title: os | eventName;
   value: number;
   color?: string;
+}
+
+export interface EventsLogResponse {
+  events: Event[];
+  more: boolean;
 }
 
 export type eventName = "login" | "signup" | "admin" | "/";

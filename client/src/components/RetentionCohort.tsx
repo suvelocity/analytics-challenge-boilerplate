@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { httpClient } from "utils/asyncUtils";
 import { oneWeekMs, todayMs } from "utils/timeUtils";
-import { number } from "yup";
 
 const RetentionChartWrapper = styled.div`
   background-color: white;

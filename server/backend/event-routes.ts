@@ -29,6 +29,7 @@ import {
   userFieldsValidator,
   isUserValidator,
 } from "./validators";
+import { off } from "process";
 const router = express.Router();
 
 // Routes
@@ -43,17 +44,21 @@ router.get("/all", (req: Request, res: Response) => {
 router.get("/all-filtered", (req: Request, res: Response) => {
   const filter: Filter = req.query;
 
-  const offset: number = filter?.offset ? filter.offset : 10000000000;
-  const filtered = getAllEventsFiltered(filter);
+  const offset: number = filter?.offset ? parseInt(filter.offset.toString()) : 10000000000;
+  const pageNumber: number = filter?.pageNumber ? parseInt(filter.pageNumber.toString()) : 0;
+  const startIndex: number = pageNumber * offset;
+  const filtered: Event[] = getAllEventsFiltered(filter);
+  const isMore: boolean = startIndex + offset < filtered.length;
 
+  // console.log(filtered.slice(startIndex, startIndex + offset));
   res.json({
     events: filtered
       // .map((event) => {
       //   event.date = (new Date(event.date) as unknown) as number;
       //   return event;
       // })
-      .slice(0, offset),
-    more: true,
+      .slice(startIndex, startIndex + offset),
+    more: isMore,
   });
 });
 
