@@ -66,12 +66,16 @@ export function formatDate(date: Date) {
 
 export function createArrayWeekAgo(offset: number) {
   const currentDate=new Date();
-  const firstDay=new Date(currentDate.setDate(currentDate.getDate()-(6+offset)));
+  let firstDay: Date=new Date(currentDate.setDate(currentDate.getDate()-(6+offset)));
   let array=[{date: formatDate(firstDay), count:0}]
   for(let i=0;i<6;i++){
       array.push({date: formatDate(new Date(currentDate.setDate(currentDate.getDate()+1))), count:0});
   }
-  return({arrayOfDates: array, firstDay: firstDay});
+  const day: number = new Date(firstDay).getDate();
+  const month: number = new Date(firstDay).getMonth() + 1;
+  const year: number = new Date(firstDay).getFullYear();
+  const firstDayUnix = new Date(`${year}/${month}/${day}`).valueOf();
+  return({arrayOfDates: array, firstDay: firstDay, firstDayUnix: firstDayUnix});
   
 };
 export function diffrenceInDays(date1: Date,date2: Date): number{
