@@ -204,6 +204,11 @@ export const getEventsByDateLimitGroupesByOs = (bottomLimit:number, topLimit:num
     event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
       return event.os}).value();
 
+export const getEventsByDateLimitGroupesByUrl = (bottomLimit:number, topLimit:number) =>
+db.get("events").filter((event:Event) => 
+  event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
+    return event.url}).value();
+
 export const getEventsByDateLimitGroupedByDate = (bottomLimit:number, topLimit:number) => 
   db.get("events").filter((event:Event) => 
     event.date > bottomLimit && event.date < topLimit).groupBy((event:Event) => {
@@ -224,6 +229,15 @@ export const getGroupdEventsByOsByDateLimit = (bottomLimit:number, topLimit:numb
     return countBy((event: Event) => {
       return event.os
     }, uniqBy("_id", groupedEvents[os]))
+  })
+}
+
+export const getGroupedEventsByUrlByDateLimit = (bottomLimit:number, topLimit:number) => {
+  const groupedEvents = getEventsByDateLimitGroupesByUrl(bottomLimit, topLimit);
+  return Object.keys(groupedEvents).map((url:string) => {
+    return countBy((event: Event) => {
+      return event.url
+    }, uniqBy("session_id", groupedEvents[url]))
   })
 }
 

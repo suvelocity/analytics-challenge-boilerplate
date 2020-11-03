@@ -11,6 +11,7 @@ import EventsLog from "components/dashboard components/EventsLog";
 import RetentionLog from "components/dashboard components/RetentionLog";
 import { AdminCard, ChartWrapper } from "components/styled components/cohort.styles";
 import EventsByOs from "components/dashboard components/EventByOs";
+import PageViews from "components/dashboard components/PageViews";
 
 
 
@@ -57,6 +58,9 @@ const DashBoard: React.FC = () => {
           </ErrorBoundary>
           <ErrorBoundary>
             <EventsByOs/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <PageViews/>
           </ErrorBoundary>
       </AdminCard>
     </>

@@ -11,39 +11,39 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AAAAAA','#800080']
 const now = Date.now();
 const monthAgo = now - 1000*60*60*24*31
 
-const EventsByOs: React.FC<{}> = ({}) => {
-    const [allOsCounts, setAllOsCounts] = useState<object[]>();
+const PageViews: React.FC<{}> = ({}) => {
+    const [allUrlVisits, setAllUrlVisits] = useState<object[]>();
     const [timeStamp, settimeStamp] = useState<number>(monthAgo);
 
     useEffect( () => {
-        fetchSessions(timeStamp);
+        fetchUrlViews(timeStamp);
     }, [timeStamp])
 
-    const fetchSessions: (timeStamp:number) => Promise<void> = async () => {
+    const fetchUrlViews: (timeStamp:number) => Promise<void> = async () => {
         const { data } = await axios({
           method: "get",
-          url: `http://localhost:3001/events/chart/os/${timeStamp}`,
+          url: `http://localhost:3001/events/chart/pageview/${timeStamp}`,
         });
-        const counts = data;
-        console.log("counts",counts);
-        setAllOsCounts(counts);
+        const urlVisits = data;
+        console.log(data);
+        setAllUrlVisits(urlVisits);
       };
 
-    const getDateDifferences = (dateToStart:string):number => {
+    const getDateDifferences = (dateTurltart:string):number => {
 
-      if (new Date(dateToStart).getTime() < Date.now()) {
-        return  new Date(dateToStart).getTime()
+      if (new Date(dateTurltart).getTime() < Date.now()) {
+        return  new Date(dateTurltart).getTime()
       } else return 0
     }
 
-    const onEventChange = (dateToStart:string) => {
-      settimeStamp(getDateDifferences(dateToStart));
+    const onEventChange = (dateTurltart:string) => {
+      settimeStamp(getDateDifferences(dateTurltart));
     }
 
  
   return (
     <ChartWrapper>
-      { allOsCounts ?
+      { allUrlVisits ?
       <div>
         <DatePickerWrapper className="form">
         <TextField
@@ -58,9 +58,9 @@ const EventsByOs: React.FC<{}> = ({}) => {
         </DatePickerWrapper>
         <PieChart width={730} height={350}>
             <Pie 
-                data={allOsCounts}
+                data={allUrlVisits}
                 dataKey="count"
-                nameKey="os"
+                nameKey="url"
                 cx="50%"
                 cy="50%"
                 innerRadius={50}
@@ -68,8 +68,8 @@ const EventsByOs: React.FC<{}> = ({}) => {
                 label
             >
             {
-            allOsCounts.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
-                }    
+            allUrlVisits.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)
+            }    
             </Pie>
             <Tooltip/>
             <Legend/>
@@ -81,4 +81,4 @@ const EventsByOs: React.FC<{}> = ({}) => {
   );
 };
 
-export default EventsByOs;
+export default PageViews;

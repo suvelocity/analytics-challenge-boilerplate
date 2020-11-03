@@ -5,7 +5,7 @@ import { Request, Response } from "express";
 
 // some useful database functions in here:
 import {
-  getAllEvents, getEventsGroupedByDay, getSpecificEventsByDateLimit, sortEventsByDate, getGroupdEventsByDateLimitForApi, getEventsByDateLimitGroupedByDate, saveEvent, getGroupdEventsByOsByDateLimit
+  getAllEvents, getEventsGroupedByDay, getSpecificEventsByDateLimit, sortEventsByDate, getGroupdEventsByDateLimitForApi, getEventsByDateLimitGroupedByDate, saveEvent, getGroupdEventsByOsByDateLimit, getGroupedEventsByUrlByDateLimit
 } from "./database";
 import { Event, weeklyRetentionObject } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
@@ -279,7 +279,19 @@ router.get('/chart/os/:time',(req: Request, res: Response) => {
 })
 
 router.get('/chart/pageview/:time',(req: Request, res: Response) => {
-  res.send('/chart/pageview/:time')
+  const now = Date.now();
+  const timeToStart:number = Number(req.params.time);
+
+  const events = getGroupedEventsByUrlByDateLimit(timeToStart, now)
+
+  const allUrls = events.map(event => Object.keys(event));
+  const counts = events.map(event => Object.values(event));
+
+  const results:{url:string, count:number}[] = events.map((groupedEvent, i) => {
+    return {url: allUrls[i][0], count:counts[i][0]}
+  }) 
+
+  res.send(results);  
 })
 
 router.get('/chart/timeonurl/:time',(req: Request, res: Response) => {
