@@ -20,6 +20,7 @@ let week0Retention : weeklyRetentionObject = {
 
 
 export const ensureAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+  //@ts-ignore
   if (req.isAuthenticated()) {
     return next();
   }
@@ -41,8 +42,9 @@ export const validateMiddleware = (validations: any[]) => {
     res.status(422).json({ errors: errors.array() });
   };
 };
-
+  //@ts-ignore
 export function AdminValidation(req: Request, res: Response, next: NextFunction) {
+    //@ts-ignore
   const userId = req.session!.passport.user;
   const user = getUserById(userId);
 
