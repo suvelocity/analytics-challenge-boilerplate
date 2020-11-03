@@ -19,6 +19,7 @@ import {
   eventName,
   weeklyRetentionObject,
   pieChartResponseObject,
+  GeoLocation,
 } from "../../client/src/models/event";
 import { ensureAuthenticated, validateMiddleware } from "./helpers";
 import * as alonTime from "./timeFrames";
@@ -132,8 +133,10 @@ router.get("/chart/timeonurl/:time", (req: Request, res: Response) => {
   res.send("/chart/timeonurl/:time");
 });
 
-router.get("/chart/geolocation/:time", (req: Request, res: Response) => {
-  res.send("/chart/geolocation/:time");
+//add start and end date
+router.get("/chart/geolocation", (req: Request, res: Response) => {
+  const locations: GeoLocation[] = getAllEvents().map((event: Event) => event.geolocation);
+  res.json(locations);
 });
 
 export default router;

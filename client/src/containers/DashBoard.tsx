@@ -10,6 +10,7 @@ import SessionsByHoursChart from "components/SessionsByHoursChart";
 import GenericPieChart from "components/PieChart";
 import RetentionCohort from "components/RetentionCohort";
 import AllEventsLog from "components/AllEventsLog";
+import LocationChart from "components/LocationsChart";
 export interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
@@ -47,6 +48,7 @@ const DashBoard: React.FC = () => {
           </div>
           <RetentionCohort />
           <AllEventsLog />
+          <LocationChart />
           {/* <div className="chart1">a</div>
           <div className="chart2">a</div>
           <div className="chart3">a</div>
