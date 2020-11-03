@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
+import { ChartWrapper, DatePickerWrapper } from "components/styled components/cohort.styles";
 import { Event } from '../../models/event'
 import axios from 'axios'
 import { LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, Legend } from 'recharts'
 import { TextField } from "@material-ui/core";
 
 const SessionByHours: React.FC<{}> = ({}) => {
-    const [allSessions, setAllSessions] = useState<object[]>();
-    const [offset, setOffset] = useState<number>(0);
+  const [allSessions, setAllSessions] = useState<object[]>();
+  const [offset, setOffset] = useState<number>(0);
 
     useEffect( () => {
         fetchSessions(offset);
@@ -32,24 +33,26 @@ const SessionByHours: React.FC<{}> = ({}) => {
     }
       
   return (
-    <div>
+    <ChartWrapper>
       { allSessions ?
       <div>
+        <DatePickerWrapper className="form">
         <TextField
           id="offset"
           label="date"
           type="date"
           onChange={(e)=>{onEventChange(e.target.value)}}
-          // className={classes.textField}
           InputLabelProps={{
             shrink: true,
           }}
         />
-        <LineChart width={730} height={250} data={allSessions}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        </DatePickerWrapper>
+        <LineChart width={500} height={250} data={allSessions}
+          margin={{ top: 10, right: 60, bottom: 5 }}
+        >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="hour" />
-        <YAxis />
+        <XAxis tick={{fontSize: 7}} dataKey="hour" />
+        <YAxis tick={{fontSize: 7}}/>
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="count" stroke="#8884d8" />
@@ -57,7 +60,7 @@ const SessionByHours: React.FC<{}> = ({}) => {
         </div>
        : <h1>Loader</h1>
       }
-    </div>
+    </ChartWrapper>
   );
 };
 

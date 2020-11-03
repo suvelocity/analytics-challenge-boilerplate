@@ -1,16 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { GoogleMap, LoadScript, Marker, MarkerClusterer } from '@react-google-maps/api';
+import { MapWrapper } from "components/styled components/cohort.styles";
 import { Event } from '../../models/event'
 import axios from 'axios'
 
 const mapContainerStyle = {
-    width: '50vw',
-    height: '50vh'
+    width: '100%',
+    height: '100%'
     };
 
+const ClustererOptions = {
+    imagePath:
+        'https://developers.google.com/maps/documentation/javascript/examples/markerclusterer/m', // so you must have m1.png, m2.png, m3.png, m4.png, m5.png and m6.png in that folder
+    }
+
 const defaultCenter = { lat: 31.45, lng: 35 };
-
-
 
 const EventsMap: React.FC<{}> = ({}) => {
     const [allEvents, setAllEvents] = useState<Event[]>();
@@ -29,26 +33,25 @@ const EventsMap: React.FC<{}> = ({}) => {
       };
 
   return (
-    <div>
+    <MapWrapper>
         <LoadScript googleMapsApiKey={'AIzaSyCO2CJy9I3evBaiw5rCesn6vzC7TmC4vH0'}>
             <GoogleMap
               options={ 
                 {
-                    draggable: false,
+                    draggable: true,
                     // scrollwheel: false,
                     // zoomControl: false,
                 }
               }
               mapContainerStyle={mapContainerStyle}
               center={defaultCenter}
-              zoom={1}
+              zoom={1.5}
             >
             {/* <div> */}
                 <MarkerClusterer
-                    // onClick={props.onMarkerClustererClick}
                     averageCenter
                     enableRetinaIcons
-                    gridSize={60}
+                    gridSize={80}
                 >
                 { 
                     (clusterer) => allEvents ? allEvents.map(event => (
@@ -70,7 +73,7 @@ const EventsMap: React.FC<{}> = ({}) => {
             {/* </div> */}
             </GoogleMap>
         </LoadScript>
-    </div>
+    </MapWrapper>
   );
 };
 

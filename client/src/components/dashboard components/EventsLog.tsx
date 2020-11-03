@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { Event } from '../../models/event'
+import { EventLogWrapper, FormWrapper } from "components/styled components/cohort.styles";
 import axios from 'axios'
 import { 
     Accordion, 
@@ -25,12 +26,15 @@ import {
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import SearchIcon from '@material-ui/icons/Search';
+import KeyboardIcon from '@material-ui/icons/Keyboard';
 import { Filter } from "../../../../server/backend/event-routes";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
     root: {
-      width: '100%',
+      position: "relative",
+      padding: "10px",
+      maxWidth: '400px',
       maxHeight: '100px',
     },
     heading: {
@@ -43,12 +47,13 @@ const useStyles = makeStyles((theme: Theme) =>
       color: theme.palette.text.secondary,
     },
     table: {
-        minWidth: 650,
+      maxWidth: "100%",
     },
+    formControl: {
+      width: "7vw",
+    }
   }),
 );
-
-type FilterKeys = "sorting" | "type" | "browser" | "search" | "offset" | string;
 
 const EventsLog: React.FC<{}> = ({}) => {
     const classes = useStyles();
@@ -98,116 +103,125 @@ const EventsLog: React.FC<{}> = ({}) => {
     }
       
   return (
-    <div>
+    <EventLogWrapper>
       { allEvents ?
       <div>
-        <div>
-          <InputLabel htmlFor="Search">Search</InputLabel>
-            <Input
-            id="search"
-            startAdornment={
-              <InputAdornment position="start">
-                <SearchIcon />
-              </InputAdornment>
-            }></Input>
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <FormControl>
-              <InputLabel id="sort">sort</InputLabel>
-              <Controller
-                as={
-                  <Select labelId="sort" label={"sort"}>
-                    <MenuItem value="+date">start</MenuItem>
-                    <MenuItem value="-date">end</MenuItem>
-                  </Select>
-                }
-                name="sorting"
-                control={control}
-                defaultValue="+date"
-              />
-            </FormControl>
-            <FormControl>
-              <InputLabel id="event">event</InputLabel>
-              <Controller
-                as={
-                  <Select labelId="event" label={"event"}>
-                    <MenuItem value="login">login</MenuItem>
-                    <MenuItem value="signup">signup</MenuItem>
-                    <MenuItem value="admin">admin</MenuItem>
-                    <MenuItem value="/">/</MenuItem>
-                  </Select>
-                }
-                name="type"
-                control={control}
-                defaultValue=""
-              />
-            </FormControl>
-            <FormControl>
-              <InputLabel id="browser">browser</InputLabel>
-              <Controller
-                as={
-                  <Select labelId="browser" label={"browser"}>
-                    <MenuItem value="chrome">chrome</MenuItem>
-                    <MenuItem value="safari">safari</MenuItem>
-                    <MenuItem value="edge">edge</MenuItem>
-                    <MenuItem value="firefox">firefox</MenuItem>
-                    <MenuItem value="ie">ie</MenuItem>
-                    <MenuItem value="other">other</MenuItem>  
-                  </Select>
-                }
-                name="browser"
-                control={control}
-                defaultValue=""
-              />
-            </FormControl>
-            <IconButton type="submit">
-              <SearchIcon/>
-            </IconButton>
-          </form>
-        </div>
-      <div className={classes.root}>
-        { allEvents.events.map((event:Event,i) => (
-          <Accordion expanded={expanded === `panel${i+1}`} onChange={handleChange(`panel${i+1}`)}>
-            <AccordionSummary
-            expandIcon={<ExpandMoreIcon />}
-            aria-controls={`panel${i+1}bh-content`}
-            id={`panel${i+1}bh-header`}
-            >
-            <Typography className={classes.heading}>{event.name}</Typography>
-            <Typography className={classes.secondaryHeading}>By User-Id {event.distinct_user_id}</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-                <TableContainer component={Paper}>
-                    <Table className={classes.table} size="small" aria-label="a dense table">
-                        <TableHead>
-                        <TableRow>
-                            <TableCell align="center">Date</TableCell>
-                            <TableCell align="center">os</TableCell>
-                            <TableCell align="center">browser</TableCell>
-                            <TableCell align="center">url</TableCell>
-                            <TableCell align="center">session id</TableCell>
-                        </TableRow>
-                        </TableHead>
-                        <TableBody>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <FormWrapper className="form">
+              <FormControl size="small" className={classes.formControl}>
+              <InputLabel id="sort">search</InputLabel>
+                <Controller
+                  as={
+                    <Input 
+                    id="search"
+                    startAdornment={
+                      <InputAdornment position="start">
+                        <KeyboardIcon />
+                      </InputAdornment>
+                    }/>
+                  }
+                  name="seacrh"
+                  control={control}
+                  defaultValue=""
+                />
+              </FormControl>
+              <FormControl size="small" className={classes.formControl}>
+                <InputLabel id="sort">sort</InputLabel>
+                <Controller
+                  as={
+                    <Select labelId="sort" label={"sort"}>
+                      <MenuItem value="+date">start</MenuItem>
+                      <MenuItem value="-date">end</MenuItem>
+                    </Select>
+                  }
+                  name="sorting"
+                  control={control}
+                  defaultValue="+date"
+                />
+              </FormControl>
+              <FormControl size="small" className={classes.formControl}>
+                <InputLabel id="event">event</InputLabel>
+                <Controller
+                  as={
+                    <Select labelId="event" label={"event"}>
+                      <MenuItem value="login">login</MenuItem>
+                      <MenuItem value="signup">signup</MenuItem>
+                      <MenuItem value="admin">admin</MenuItem>
+                      <MenuItem value="/">/</MenuItem>
+                    </Select>
+                  }
+                  name="type"
+                  control={control}
+                  defaultValue=""
+                />
+              </FormControl>
+              <FormControl size="small" className={classes.formControl}>
+                <InputLabel id="browser">browser</InputLabel>
+                <Controller
+                  as={
+                    <Select labelId="browser" label={"browser"}>
+                      <MenuItem value="chrome">chrome</MenuItem>
+                      <MenuItem value="safari">safari</MenuItem>
+                      <MenuItem value="edge">edge</MenuItem>
+                      <MenuItem value="firefox">firefox</MenuItem>
+                      <MenuItem value="ie">ie</MenuItem>
+                      <MenuItem value="other">other</MenuItem>  
+                    </Select>
+                  }
+                  name="browser"
+                  control={control}
+                  defaultValue=""
+                />
+              </FormControl>
+              <IconButton type="submit" color="primary">
+                <SearchIcon/>
+              </IconButton>
+          </FormWrapper>
+        </form>
+          <div className={classes.root}>
+            { allEvents.events.map((event:Event,i) => (
+              <Accordion expanded={expanded === `panel${i+1}`} onChange={handleChange(`panel${i+1}`)}>
+                <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls={`panel${i+1}bh-content`}
+                id={`panel${i+1}bh-header`}
+                >
+                <Typography className={classes.heading}>{event.name}</Typography>
+                <Typography className={classes.secondaryHeading}>By User-Id {event.distinct_user_id}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                    <TableContainer component={Paper}>
+                        <Table className={classes.table} size="small" aria-label="a dense table">
+                            <TableHead>
                             <TableRow>
-                            <TableCell component="th" scope="row">
-                                {new Date(event.date).toLocaleDateString()}
-                            </TableCell>
-                            <TableCell align="center">{event.os}</TableCell>
-                            <TableCell align="center">{event.browser}</TableCell>
-                            <TableCell align="center">{event.url}</TableCell>
-                            <TableCell align="center">{event.session_id}</TableCell>
+                                <TableCell align="center">Date</TableCell>
+                                <TableCell align="center">os</TableCell>
+                                <TableCell align="center">browser</TableCell>
+                                <TableCell align="center">url</TableCell>
+                                <TableCell align="center">session id</TableCell>
                             </TableRow>
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </AccordionDetails>
-        </Accordion>
-        ))}
+                            </TableHead>
+                            <TableBody>
+                                <TableRow>
+                                <TableCell component="th" scope="row">
+                                    {new Date(event.date).toLocaleDateString()}
+                                </TableCell>
+                                <TableCell align="center">{event.os}</TableCell>
+                                <TableCell align="center">{event.browser}</TableCell>
+                                <TableCell align="center">{event.url}</TableCell>
+                                <TableCell align="center">{event.session_id}</TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </AccordionDetails>
+            </Accordion>
+            ))}
         </div>
       </div>
-        : <h1>Loader</h1>
+  : <h1>Loader</h1>
       }
-    </div>
+    </EventLogWrapper>
   );
 };
 

@@ -8,6 +8,9 @@ import ErrorBoundary from '../containers/ErrorBoundaries'
 import SessionByDays from "components/dashboard components/SessionByDays";
 import SessionByHours from "components/dashboard components/SessionByHours";
 import EventsLog from "components/dashboard components/EventsLog";
+import RetentionLog from "components/dashboard components/RetentionLog";
+import { AdminCard } from "components/styled components/cohort.styles";
+
 
 
 const useStyles = makeStyles((theme) => ({
@@ -32,33 +35,26 @@ const DashBoard: React.FC = () => {
 
   return (
     <>
-      <Paper className={classes.paper}>
+      <AdminCard>
       <Typography component="h2" variant="h6" color="primary" gutterBottom>
         Analytics
       </Typography>
-      <Box      
-        display="flex"
-        height={600}
-        min-height={600}
-        alignItems="center"
-        justifyContent="center"
-        border={1}
-        borderColor={grey[200]}
-      >
-        <ErrorBoundary>
-          <EventsMap/>
-        </ErrorBoundary>
-        <ErrorBoundary>
-          <SessionByDays/>
-        </ErrorBoundary>
-        <ErrorBoundary>
-          <SessionByHours/>
-        </ErrorBoundary>
-        <ErrorBoundary>
-          <EventsLog/>
-        </ErrorBoundary>
-      </Box>
-      </Paper>
+          <ErrorBoundary>
+            <EventsMap/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <SessionByDays/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <SessionByHours/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <EventsLog/>
+          </ErrorBoundary>
+          <ErrorBoundary>
+            <RetentionLog/>
+          </ErrorBoundary>
+      </AdminCard>
     </>
   );
 };

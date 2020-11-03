@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Event } from '../../models/event'
+import { ChartWrapper, DatePickerWrapper } from "components/styled components/cohort.styles";
 import axios from 'axios'
 import { LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, Legend } from 'recharts'
 import { TextField } from "@material-ui/core";
@@ -33,24 +34,26 @@ const SessionByDays: React.FC<{}> = ({}) => {
     }
       
   return (
-    <div>
+    <ChartWrapper>
       { allSessions ?
       <div>
+        <DatePickerWrapper className="form">
         <TextField
           id="offset"
           label="start date"
           type="date"
           onChange={(e)=>{onEventChange(e.target.value)}}
-          // className={classes.textField}
           InputLabelProps={{
             shrink: true,
           }}
         />
-        <LineChart width={730} height={250} data={allSessions}
-        margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+        </DatePickerWrapper>
+        <LineChart width={500} height={250} data={allSessions}
+        margin={{ top: 10, right: 60, bottom: 5 }}
+        >
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="date" />
-        <YAxis />
+        <XAxis dataKey="date" tick={{fontSize: 7}}/>
+        <YAxis tick={{fontSize: 7}}/>
         <Tooltip />
         <Legend />
         <Line type="monotone" dataKey="count" stroke="#8884d8" />
@@ -58,7 +61,7 @@ const SessionByDays: React.FC<{}> = ({}) => {
         </div>
        : <h1>Loader</h1>
       }
-    </div>
+    </ChartWrapper>
   );
 };
 
