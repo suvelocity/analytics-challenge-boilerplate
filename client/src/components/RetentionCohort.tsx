@@ -26,7 +26,7 @@ const RetentionChartRow = styled.div`
   background-color: ${(props) => props.theme.chart.background};
   display: grid;
   grid-auto-flow: column;
-  grid-template-columns: 18vw repeat(auto-fill, 10vw);
+  grid-template-columns: 25% repeat(auto-fill, 10%);
   column-gap: 3px;
   margin: 3px auto;
   padding: 5px 0 5px 10px;

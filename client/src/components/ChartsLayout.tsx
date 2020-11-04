@@ -15,26 +15,29 @@ export const ChartsLayout = styled.div`
 
   /* grid-template-rows: minmax(400px, 50vw); */
   left: 50%;
+  margin-top: -10vh;
   margin-left: -40vw;
   max-width: 100vw;
   position: relative;
   right: 50%;
   width: 80vw;
 
-  #chart1 {
-    width: 80%;
-    height: 33vh;
+  #chart1,
+  #chart2 {
+    width: 45%;
+    height: 40vh;
+    padding: 2vw;
     /* background-color: ${(props) => props.theme.body.background};
     color: ${(props) => props.theme.body.text}; */
   }
   #chart2 {
-    width: 70%;
-    height: 33vh;
+    /* width: 45%;
+    height: 40vh; */
     /* background-color: ${(props) => props.theme.body.background};
     color: ${(props) => props.theme.body.text}; */
     /* grid-area: chart2; */
   }
-  #chart3 {
+  .pie-charts {
     width: 25%;
     height: 40vh;
     /* background-color: cyan;
@@ -42,19 +45,20 @@ export const ChartsLayout = styled.div`
   }
 
   #retention {
-    width: 100%;
+    width: 95%;
     height: 75vh;
+    margin: 5vh auto;
   }
-  .chart4 {
-    width: 100%;
-    height: 100%;
+  #all-events {
+    width: 95%;
+    height: 35%;
+    margin: 0 auto;
     /* background-color: green;
     grid-area: chart4; */
   }
-  .chart5 {
+  #locations {
     width: 100%;
     height: 100%;
     background-color: pink;
-    grid-area: chart5;
   }
 `;

@@ -31,9 +31,9 @@ const DashBoard: React.FC = () => {
   return (
     <>
       <GlobalStyle />
-      <button onClick={toggleTheme}></button>
       <ThemeProvider theme={currentStyle}>
         <ChartsLayout>
+          <button onClick={toggleTheme}>Dark mode</button>
           <div id="chart1">
             <SessionsByHoursChart />
           </div>
@@ -41,17 +41,21 @@ const DashBoard: React.FC = () => {
             <SessionsByDaysChart />
             {/* <SessionsByHoursChart className="chart2" /> */}
           </div>
-          <div id="chart3">
+          <div className="pie-charts">
             <GenericPieChart filter="os" />
           </div>
-          <div id="chart3">
+          <div className="pie-charts">
             <GenericPieChart filter="pageView" />
           </div>
           <div id="retention">
             <RetentionCohort />
           </div>
-          <AllEventsLog />
-          <LocationChart />
+          <div id="all-events">
+            <AllEventsLog />
+          </div>
+          <div id="locations">
+            <LocationChart />
+          </div>
           {/* <div className="chart1">a</div>
           <div className="chart2">a</div>
           <div className="chart3">a</div>

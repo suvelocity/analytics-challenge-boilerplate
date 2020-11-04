@@ -2,12 +2,20 @@ import React, { useState, useCallback, useContext, useRef } from "react";
 import useInfiniteScroll from "utils/useInfinteScroll";
 import { browser, Event, eventName, Filter, os } from "../models/event";
 import styled, { ThemeContext } from "styled-components";
-import { FormControl, InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import {
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Typography,
+  TextField,
+} from "@material-ui/core";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { withStyles } from "@material-ui/core/styles";
 import MuiAccordion from "@material-ui/core/Accordion";
 import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
 import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
+import { convertToDate } from "utils/timeUtils";
 
 const Accordion = withStyles({
   root: {
@@ -291,7 +299,7 @@ const AllEventsLog: React.FC = () => {
   //   );
   //#endregion
   const [pageNumber, setPageNumber] = useState<number>(0);
-  const [expanded, setExpanded] = React.useState<string | false>("panel1");
+  const [expanded, setExpanded] = React.useState<string | false>(false);
   const [query, setQuery] = useState<Filter>({
     sorting: "-date",
     offset: 10,
@@ -328,9 +336,12 @@ const AllEventsLog: React.FC = () => {
     [loading, hasMore]
   );
 
-  const handleSearch = (e: Event): void => {
+  const handleSearch = (e: any): void => {
     //@ts-ignore
-    setQuery(e.target.value);
+    const newSearchQuery: string = e.target.value;
+    const newQuery: Filter = { ...query };
+    newQuery.search = newSearchQuery;
+    setQuery(newQuery);
     setPageNumber(0);
   };
 
@@ -354,10 +365,11 @@ const AllEventsLog: React.FC = () => {
   };
 
   // const logs = data.map((event: Event) => event._id);
-  console.log(query);
+
   return (
     <LogsWrapper>
       <SortingColumn>
+        <TextField label="Search" onChange={handleSearch} />
         <FormControl>
           <InputLabel>Event Type</InputLabel>
           <Select
@@ -406,6 +418,10 @@ const AllEventsLog: React.FC = () => {
                 onChange={handleChange(`panel${i}`)}
               >
                 <AccordionSummary
+                  style={{
+                    backgroundColor: themeContext.chart.background,
+                    color: themeContext.chart.text,
+                  }}
                   expandIcon={<ExpandMoreIcon />}
                   aria-controls={`panel${i}a-content`}
                   id={`panel${i}d-header`}
@@ -415,7 +431,16 @@ const AllEventsLog: React.FC = () => {
                   <Typography>User {log.distinct_user_id}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>Event Name: {log.name}</Typography>
+                  <Typography>
+                    <b>Event Name: </b> {log.name}
+                    <br />
+                    <b>Date: </b> {convertToDate(log.date)}
+                    <br />
+                    <b>Browser: </b>
+                    {log.browser}
+                    <br />
+                    <b>Operating System: </b> {log.os}
+                  </Typography>
                 </AccordionDetails>
               </Accordion>
             );
@@ -439,12 +464,41 @@ const AllEventsLog: React.FC = () => {
                   <Typography>User {log.distinct_user_id}</Typography>
                 </AccordionSummary>
                 <AccordionDetails>
-                  <Typography>Event Name: {log.name}</Typography>
+                  <Typography>
+                    <b>Event Name: </b> {log.name}
+                    <br />
+                    <b>Date: </b> {convertToDate(log.date)}
+                    <br />
+                    <b>Browser: </b>
+                    {log.browser}
+                    <br />
+                    <b>Operating System: </b> {log.os}
+                  </Typography>
                 </AccordionDetails>
               </Accordion>
             );
           }
         })}
+
+        {!loading && data.length === 0 && (
+          <Accordion square expanded={expanded === `panel0`} onChange={handleChange(`panel0`)}>
+            <AccordionSummary
+              style={{
+                backgroundColor: themeContext.chart.background,
+                color: themeContext.chart.text,
+              }}
+              expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
+              aria-controls={`panel0a-content`}
+              id={`panel0d-header`}
+              key={`log0`}
+            >
+              <Typography>No results!</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Typography>:(</Typography>
+            </AccordionDetails>
+          </Accordion>
+        )}
         <div>{loading && "Loading..."}</div>
         <div>{error && "Error"}</div>
       </Logs>

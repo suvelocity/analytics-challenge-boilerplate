@@ -43,7 +43,10 @@ const SessionsByDaysChart: React.FC = () => {
       <ResponsiveContainer width={"100%"} height={"100%"}>
         <LineChart
           data={data}
-          style={{ backgroundColor: themeContext.chart.background, fontSize: "10px" }}
+          style={{
+            backgroundColor: themeContext.chart.background,
+            fontSize: "1em",
+          }}
         >
           <XAxis dataKey="date" stroke={themeContext.chart.axis} />
           <YAxis stroke={themeContext.chart.axis} />

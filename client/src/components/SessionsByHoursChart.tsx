@@ -44,7 +44,10 @@ const SessionsByHoursChart: React.FC = () => {
       <ResponsiveContainer width={"100%"} height={"100%"}>
         <LineChart
           data={data}
-          style={{ backgroundColor: themeContext.chart.background, fontSize: "12px" }}
+          style={{
+            backgroundColor: themeContext.chart.background,
+            fontSize: "1em",
+          }}
         >
           <XAxis dataKey="hour" stroke={themeContext.chart.axis} />
           <YAxis stroke={themeContext.chart.axis} />
