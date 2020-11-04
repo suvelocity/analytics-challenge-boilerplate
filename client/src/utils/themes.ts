@@ -13,7 +13,7 @@ export const lightTheme = {
 
 export const darkTheme = {
   body: {
-    background: "#363537",
+    background: "#222222",
     text: "#FAFAFA",
   },
   chart: {

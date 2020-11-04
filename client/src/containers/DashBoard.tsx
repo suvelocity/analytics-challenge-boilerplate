@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Interpreter } from "xstate";
 import { AuthMachineContext, AuthMachineEvents } from "../machines/authMachine";
 import { ChartsLayout } from "../components/ChartsLayout";
-import { createGlobalStyle, ThemeProvider } from "styled-components";
+import styled, { createGlobalStyle, ThemeProvider } from "styled-components";
 import { useDarkMode } from "utils/useDarkMode";
 import { darkTheme, lightTheme } from "utils/themes";
 import SessionsByDaysChart from "components/SessionsByDaysChart";
@@ -21,6 +21,15 @@ body {
 }
 `;
 
+const PairContainer = styled.div`
+  display: flex;
+  align-items: flex-end;
+
+  @media screen and (max-width: 1000px) {
+    flex-direction: column;
+  }
+`;
+
 const DashBoard: React.FC = () => {
   const [theme, changeTheme, themeLoaded] = useDarkMode();
 
@@ -34,19 +43,23 @@ const DashBoard: React.FC = () => {
       <ThemeProvider theme={currentStyle}>
         <ChartsLayout>
           <button onClick={toggleTheme}>Dark mode</button>
-          <div id="chart1">
-            <SessionsByHoursChart />
-          </div>
-          <div id="chart2">
-            <SessionsByDaysChart />
-            {/* <SessionsByHoursChart className="chart2" /> */}
-          </div>
-          <div className="pie-charts">
-            <GenericPieChart filter="os" />
-          </div>
-          <div className="pie-charts">
-            <GenericPieChart filter="pageView" />
-          </div>
+          <PairContainer>
+            <div id="chart1" className="line-charts">
+              <SessionsByHoursChart />
+            </div>
+            <div className="pie-charts">
+              <GenericPieChart filter="os" title="Operating System" />
+            </div>
+          </PairContainer>
+          <PairContainer>
+            <div id="chart2" className="line-charts">
+              <SessionsByDaysChart />
+              {/* <SessionsByHoursChart className="chart2" /> */}
+            </div>
+            <div className="pie-charts">
+              <GenericPieChart filter="pageView" title="Pages" />
+            </div>
+          </PairContainer>
           <div id="retention">
             <RetentionCohort />
           </div>

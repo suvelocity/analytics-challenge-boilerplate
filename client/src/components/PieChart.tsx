@@ -51,19 +51,29 @@ const RADIAN: number = Math.PI / 180;
 //#endregion
 
 const InnerText = styled.div`
-  padding-top: 40%;
+  position: absolute;
   text-align: center;
-  font-size: 100px;
-  color: red;
-  z-index: 3;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 0.9vw;
+  color: ${(props) => props.theme.body.text};
+  z-index: 2;
+`;
+
+const PieContainer = styled.div`
+  position: relative;
+  width: 100%;
+  height: 100%;
 `;
 
 interface chartProps {
   filter: "os" | "pageView";
+  title: string;
 }
 
 const segmantsColors: string[] = ["blue", "red", "gray", "green", "orange", "purple"];
-const GenericPieChart: React.FC<chartProps> = ({ filter }) => {
+const GenericPieChart: React.FC<chartProps> = ({ filter, title }) => {
   const [data, setData] = useState();
   const themeContext = useContext(ThemeContext);
   //#region fuck off recharts
@@ -104,7 +114,7 @@ const GenericPieChart: React.FC<chartProps> = ({ filter }) => {
     fetchData();
   }, []);
   return (
-    <>
+    <PieContainer>
       <PieChart
         data={data}
         animate={true}
@@ -124,11 +134,15 @@ const GenericPieChart: React.FC<chartProps> = ({ filter }) => {
           position: "relative",
           backgroundColor: themeContext.chart.background,
           borderRadius: "20px",
-          paddingBottom: "20px",
-          paddingTop: "20px",
+          paddingBottom: "10px",
+          paddingTop: "10px",
         }}
       />
-    </>
+      <InnerText>
+        <b>Events by:</b> <br />
+        {title}
+      </InnerText>
+    </PieContainer>
   );
 };
 //#endregion

@@ -15,8 +15,8 @@ interface StyledRegularCell {
 //   },
 // }))``;
 
+// background-color: ${(props) => props.theme.chart.axis};
 const RetentionChartWrapper = styled.div`
-  background-color: ${(props) => props.theme.chart.axis};
   color: ${(props) => props.theme.chart.text};
   overflow: scroll;
   max-height: 100%;
@@ -31,19 +31,27 @@ const RetentionChartRow = styled.div`
   margin: 3px auto;
   padding: 5px 0 5px 10px;
   min-height: 60px;
-  font-size: 1.1em;
+  font-size: 1.1vw;
+
+  @media screen and (max-width: 700px) {
+    font-size: 1.1em;
+  }
 `;
 
 const LeftColumnCell = styled.div`
   display: flex;
   flex-direction: column;
-  font-size: 1.3em;
+  font-size: 1.4vw;
   font-weight: bold;
+
+  @media screen and (max-width: 700px) {
+    font-size: 1.3em;
+  }
 
   .users-number {
     font-style: italic;
     font-weight: initial;
-    font-size: 0.65em;
+    font-size: 12px;
   }
 `;
 

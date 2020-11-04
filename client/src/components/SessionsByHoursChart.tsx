@@ -34,12 +34,13 @@ const SessionsByHoursChart: React.FC = () => {
   return data ? (
     <>
       <TextField
-        label="day"
+        label="Pick Day"
         type="date"
         onChange={handleDatePick}
         value={
           offset ? new Date(todayMs() - oneDayMs * offset).toISOString().slice(0, 10) : nowString()
         }
+        style={{ backgroundColor: themeContext.chart.background, borderRadius: "10px" }}
       />
       <ResponsiveContainer width={"100%"} height={"100%"}>
         <LineChart
@@ -47,6 +48,7 @@ const SessionsByHoursChart: React.FC = () => {
           style={{
             backgroundColor: themeContext.chart.background,
             fontSize: "1em",
+            borderRadius: "10px",
           }}
         >
           <XAxis dataKey="hour" stroke={themeContext.chart.axis} />

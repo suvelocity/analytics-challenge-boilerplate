@@ -59,10 +59,14 @@ const AccordionDetails = withStyles((theme) => ({
 }))(MuiAccordionDetails);
 
 const LogsWrapper = styled.div`
-  background-color: red;
+  background-color: ${(props) => props.theme.chart.graph};
   display: flex;
-  height: 300px;
+  height: 400px;
   font-size: "20px";
+
+  @media screen and (max-width: 700px) {
+    flex-direction: column;
+  }
 `;
 
 const SortingColumn = styled.div`
@@ -70,6 +74,10 @@ const SortingColumn = styled.div`
   flex-direction: column;
   width: 20%;
   margin: 0 auto;
+  @media screen and (max-width: 700px) {
+    flex-direction: row;
+    width: 100%;
+  }
 `;
 
 const Logs = styled.div`
@@ -77,6 +85,9 @@ const Logs = styled.div`
   overflow-x: hidden;
   margin-left: auto;
   width: 65%;
+  @media screen and (max-width: 700px) {
+    width: 100%;
+  }
 `;
 
 //constant filters
