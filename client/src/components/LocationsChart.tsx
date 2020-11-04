@@ -18,6 +18,7 @@ const LocationChart: React.FC = () => {
     fetchData();
   }, []);
 
+  console.log(REACT_APP_GOOGLE_MAP_KEY);
   return (
     <>
       <LoadScript googleMapsApiKey={REACT_APP_GOOGLE_MAP_KEY}>
@@ -27,9 +28,13 @@ const LocationChart: React.FC = () => {
           zoom={3}
           mapContainerStyle={{ height: "600px", width: "1000px" }}
         >
-          {data?.map((locationRes: GeoLocation, i: number) => (
-            <Marker key={`marker${i}`} position={locationRes.location} />
-          ))}
+          <MarkerClusterer averageCenter maxZoom={3} enableRetinaIcons>
+            {(clusterer) =>
+              data?.map((locationRes: GeoLocation, i: number) => (
+                <Marker key={`marker${i}`} clusterer={clusterer} position={locationRes.location} />
+              ))
+            }
+          </MarkerClusterer>
         </GoogleMap>
       </LoadScript>
     </>

@@ -1,6 +1,8 @@
+import { any } from "bluebird";
 import { useEffect, useState } from "react";
 
-export const useDarkMode = (): any => {
+export const useDarkMode = (): // | [theme: string, changeTheme: () => void, themeLoaded: boolean]
+any => {
   const [theme, setTheme] = useState("light");
   const [themeLoaded, setThemeLoaded] = useState(false);
 

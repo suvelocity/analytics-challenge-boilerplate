@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import { Filter } from "models";
-import Axios from "axios";
 
 export default function useInfiniteScroll(query: Filter, pageNumber: number, url: string) {
   const [loading, setLoading] = useState<boolean>(true);
@@ -29,7 +28,7 @@ export default function useInfiniteScroll(query: Filter, pageNumber: number, url
         setHasMore(res.data.more);
         setLoading(false);
       })
-      .catch((e: ErrorEvent) => {
+      .catch((e: Error) => {
         setError(true);
       });
   }, [query, pageNumber]);

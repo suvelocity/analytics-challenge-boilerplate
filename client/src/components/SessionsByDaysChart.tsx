@@ -5,15 +5,9 @@ import { ThemeContext } from "styled-components";
 import { httpClient } from "utils/asyncUtils";
 import { nowString, todayMs, oneDayMs } from "../utils/timeUtils";
 
-interface props {
-  className: string;
-}
-
 const SessionsByDaysChart: React.FC = () => {
   const [data, setData] = useState();
   const [offset, setOffset] = useState(0);
-
-  const dateFieldRef = createRef<HTMLInputElement>();
   const themeContext = useContext(ThemeContext);
 
   const fetchData = async () => {
@@ -26,7 +20,6 @@ const SessionsByDaysChart: React.FC = () => {
     const now = todayMs();
     if (now < pickInMs) {
       alert("Pick a time in the present");
-      if (dateFieldRef.current) dateFieldRef.current.value = nowString();
       return;
     }
     const newOffset: number = Math.floor((now - pickInMs) / oneDayMs);
@@ -42,9 +35,10 @@ const SessionsByDaysChart: React.FC = () => {
       <TextField
         label="day"
         type="date"
-        defaultValue={nowString()}
         onChange={handleDatePick}
-        ref={dateFieldRef}
+        value={
+          offset ? new Date(todayMs() - oneDayMs * offset).toISOString().slice(0, 10) : nowString()
+        }
       />
       <ResponsiveContainer width={"100%"} height={"100%"}>
         <LineChart
@@ -53,7 +47,7 @@ const SessionsByDaysChart: React.FC = () => {
         >
           <XAxis dataKey="date" stroke={themeContext.chart.axis} />
           <YAxis stroke={themeContext.chart.axis} />
-          <Line type="monotone" dataKey="count" stroke={themeContext.chart.text} />
+          <Line type="monotone" dataKey="count" stroke={themeContext.chart.graph} />
           <Tooltip />
         </LineChart>
       </ResponsiveContainer>

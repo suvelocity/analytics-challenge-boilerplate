@@ -1,8 +1,80 @@
-import React, { useState, useCallback, createRef, useRef } from "react";
-import InfiniteScroll from "react-infinite-scroller";
-import { httpClient } from "utils/asyncUtils";
+import React, { useState, useCallback, useContext, useRef } from "react";
 import useInfiniteScroll from "utils/useInfinteScroll";
-import { Event, EventsLogResponse, Filter } from "../models/event";
+import { browser, Event, eventName, Filter, os } from "../models/event";
+import styled, { ThemeContext } from "styled-components";
+import { FormControl, InputLabel, Select, MenuItem, Typography } from "@material-ui/core";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import { withStyles } from "@material-ui/core/styles";
+import MuiAccordion from "@material-ui/core/Accordion";
+import MuiAccordionSummary from "@material-ui/core/AccordionSummary";
+import MuiAccordionDetails from "@material-ui/core/AccordionDetails";
+
+const Accordion = withStyles({
+  root: {
+    border: "1px solid rgba(0, 0, 0, .125)",
+    boxShadow: "none",
+    "&:not(:last-child)": {
+      borderBottom: 0,
+    },
+    "&:before": {
+      display: "none",
+    },
+    "&$expanded": {
+      margin: "auto",
+    },
+  },
+  expanded: {},
+})(MuiAccordion);
+
+const AccordionSummary = withStyles({
+  root: {
+    // backgroundColor: "rgba(0, 0, 0, .33)",
+    borderBottom: "1px solid rgba(0, 0, 0, .125)",
+    marginBottom: -1,
+    minHeight: 56,
+    "&$expanded": {
+      minHeight: 56,
+    },
+  },
+  content: {
+    "&$expanded": {
+      margin: "12px 0",
+    },
+  },
+  expanded: {},
+})(MuiAccordionSummary);
+
+const AccordionDetails = withStyles((theme) => ({
+  root: {
+    padding: theme.spacing(2),
+  },
+}))(MuiAccordionDetails);
+
+const LogsWrapper = styled.div`
+  background-color: red;
+  display: flex;
+  height: 300px;
+  font-size: "20px";
+`;
+
+const SortingColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+  margin: 0 auto;
+`;
+
+const Logs = styled.div`
+  overflow-y: scroll;
+  overflow-x: hidden;
+  margin-left: auto;
+  width: 65%;
+`;
+
+//constant filters
+const operatingSystems: os[] = ["windows", "mac", "linux", "ios", "android", "other"];
+const browsers: browser[] = ["chrome", "safari", "edge", "firefox", "ie", "other"];
+const pages: eventName[] = ["login", "signup", "admin", "/"];
 
 const AllEventsLog: React.FC = () => {
   //#region  bla
@@ -219,6 +291,7 @@ const AllEventsLog: React.FC = () => {
   //   );
   //#endregion
   const [pageNumber, setPageNumber] = useState<number>(0);
+  const [expanded, setExpanded] = React.useState<string | false>("panel1");
   const [query, setQuery] = useState<Filter>({
     sorting: "-date",
     offset: 10,
@@ -233,8 +306,9 @@ const AllEventsLog: React.FC = () => {
     pageNumber,
     `/events/all-filtered`
   );
+  const themeContext = useContext(ThemeContext);
 
-  //The Magic
+  // The Magic
   //   const observer = createRef<any>();
   const observer = useRef();
   const lastBookElementRef = useCallback(
@@ -257,27 +331,124 @@ const AllEventsLog: React.FC = () => {
   const handleSearch = (e: Event): void => {
     //@ts-ignore
     setQuery(e.target.value);
-    setPageNumber(1);
+    setPageNumber(0);
   };
 
-  const logs = data.map((event: Event) => event._id);
-  console.log(pageNumber);
+  const handleChange = (panel: string) => (event: React.ChangeEvent<{}>, newExpanded: boolean) => {
+    setExpanded(newExpanded ? panel : false);
+  };
+
+  const handleSelect = (e: any): void => {
+    const newOption: os | browser | eventName | "All" = e.target.value;
+    const trigger: string = e.target.name; //how to use Filter interface as a new type | interface?
+    const newQuery: Filter = { ...query };
+    if (newOption === "All") {
+      //@ts-ignore
+      delete newQuery[trigger];
+    } else {
+      //@ts-ignore
+      newQuery[trigger] = newOption;
+    }
+    setPageNumber(0);
+    setQuery(newQuery);
+  };
+
+  // const logs = data.map((event: Event) => event._id);
+  console.log(query);
   return (
-    <div style={{ height: "300px", overflowY: "scroll", fontSize: "20px" }}>
-      {logs.map((log: string, i: number) => {
-        if (logs.length === i + 1) {
-          return (
-            <div ref={lastBookElementRef} key={`log${i}`}>
-              {`${i}.${log}`}
-            </div>
-          );
-        } else {
-          return <div key={`log${i}`}>{`${i}.${log}`}</div>;
-        }
-      })}
-      <div>{loading && "Loading..."}</div>
-      <div>{error && "Error"}</div>
-    </div>
+    <LogsWrapper>
+      <SortingColumn>
+        <FormControl>
+          <InputLabel>Event Type</InputLabel>
+          <Select
+            value={query?.type ? query.type : "All"}
+            name="type"
+            onChange={handleSelect}
+            autoWidth
+          >
+            <MenuItem value={"All"}>All</MenuItem>
+            {pages.map((page: eventName) => (
+              <MenuItem value={page}>{page}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel>Browser</InputLabel>
+          <Select
+            value={query.browser ? query.browser : "All"}
+            name="browser"
+            onChange={handleSelect}
+            autoWidth
+          >
+            <MenuItem value="All">All</MenuItem>
+            {browsers.map((browser: browser) => (
+              <MenuItem value={browser}>{browser}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+        <FormControl>
+          <InputLabel>Operating System</InputLabel>
+          <Select value={query.os ? query.os : "All"} name="os" onChange={handleSelect} autoWidth>
+            <MenuItem value="All">All</MenuItem>
+            {operatingSystems.map((os: os) => (
+              <MenuItem value={os}>{os}</MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </SortingColumn>
+      <Logs>
+        {data.map((log: Event, i: number) => {
+          if (data.length === i + 1) {
+            return (
+              <Accordion
+                square
+                expanded={expanded === `panel${i}`}
+                onChange={handleChange(`panel${i}`)}
+              >
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls={`panel${i}a-content`}
+                  id={`panel${i}d-header`}
+                  ref={lastBookElementRef}
+                  key={`log${i}`}
+                >
+                  <Typography>User {log.distinct_user_id}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>Event Name: {log.name}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            );
+          } else {
+            return (
+              <Accordion
+                square
+                expanded={expanded === `panel${i}`}
+                onChange={handleChange(`panel${i}`)}
+              >
+                <AccordionSummary
+                  style={{
+                    backgroundColor: themeContext.chart.background,
+                    color: themeContext.chart.text,
+                  }}
+                  expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
+                  aria-controls={`panel${i}a-content`}
+                  id={`panel${i}d-header`}
+                  key={`log${i}`}
+                >
+                  <Typography>User {log.distinct_user_id}</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <Typography>Event Name: {log.name}</Typography>
+                </AccordionDetails>
+              </Accordion>
+            );
+          }
+        })}
+        <div>{loading && "Loading..."}</div>
+        <div>{error && "Error"}</div>
+      </Logs>
+    </LogsWrapper>
   );
 };
 

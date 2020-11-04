@@ -27,6 +27,7 @@ const DashBoard: React.FC = () => {
   const toggleTheme = (): void => changeTheme();
 
   const currentStyle = theme === "light" ? lightTheme : darkTheme;
+
   return (
     <>
       <GlobalStyle />
@@ -46,7 +47,9 @@ const DashBoard: React.FC = () => {
           <div id="chart3">
             <GenericPieChart filter="pageView" />
           </div>
-          <RetentionCohort />
+          <div id="retention">
+            <RetentionCohort />
+          </div>
           <AllEventsLog />
           <LocationChart />
           {/* <div className="chart1">a</div>

@@ -6,7 +6,8 @@ export const lightTheme = {
   chart: {
     background: "#F8F8F8",
     axis: "#747474",
-    text: "#3F51B5",
+    graph: "#3F51B5",
+    text: "#111111",
   },
 };
 
@@ -18,6 +19,7 @@ export const darkTheme = {
   chart: {
     background: "#363537",
     axis: "#FFF",
-    text: "#a3417a",
+    graph: "#a3417a",
+    text: "#FFF",
   },
 };

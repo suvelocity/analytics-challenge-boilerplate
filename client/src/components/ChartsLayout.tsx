@@ -4,7 +4,6 @@ import styled from "styled-components";
 export const ChartsLayout = styled.div`
   @media only screen and (max-width: 600px) {
     background-color: red;
-    font-size: 50px;
   }
 
   background-color: yellow;
@@ -40,6 +39,11 @@ export const ChartsLayout = styled.div`
     height: 40vh;
     /* background-color: cyan;
     grid-area: chart3; */
+  }
+
+  #retention {
+    width: 100%;
+    height: 75vh;
   }
   .chart4 {
     width: 100%;
