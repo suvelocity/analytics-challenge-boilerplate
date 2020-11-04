@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, CSSProperties } from "react";
 import { useForm, Controller } from "react-hook-form";
-import { Event } from '../../models/event'
-import { ChartWrapper } from "components/styled components/cohort.styles";
+import { Event, weeklyRetentionObject } from '../../models/event'
+import { ChartWrapper, TableEmptySquare, TableElement } from "components/styled components/cohort.styles";
 import axios from 'axios'
 import { 
     Accordion, 
@@ -51,7 +51,7 @@ const monthAgo = now - 1000*60*60*24*31
 
 const RetentionLog: React.FC<{}> = ({}) => {
     const classes = useStyles();
-    const [allRetentions, setAllRetentions] = useState<{events:Event[], more:boolean}>();
+    const [allRetentions, setAllRetentions] = useState<weeklyRetentionObject[]>();
     const [dayZero, setdayZero] = useState<number>(monthAgo);
 
     useEffect( () => {
@@ -61,18 +61,43 @@ const RetentionLog: React.FC<{}> = ({}) => {
     const fetchRetentions: (dayZero:number) => Promise<void> = async (query) => {
         const { data } = await axios({
           method: "get",
-          url: `http://localhost:3001/events/all-filtered?dayZero=${dayZero}`,
+          url: `http://localhost:3001/events/retention?dayZero=${dayZero}`,
         });
 
         const retentions = data;
+        console.log(data);
         setAllRetentions(retentions);
     };
       
   return (
     <ChartWrapper>
       { allRetentions ?
-          <h1>Retentions Log</h1>
-        : <h1>Loader</h1>
+          <div>
+            <TableElement>
+              <tr>
+                <th  style={{backgroundColor:"#7777", width: "200px"}}></th>
+                  {allRetentions.map(retention => 
+                  <th style={{backgroundColor:"#7777"}}>
+                    week {retention.registrationWeek}
+                  </th>)}
+              </tr>
+              <tr> 
+                <th>All Users</th>
+                {allRetentions.map(retention => <th>SUM</th>)}
+              </tr>
+              {allRetentions.map((retention, i) => (
+              <tr>
+                  <td>{`${retention.start} - ${retention.end}`}</td>
+                  {retention.weeklyRetention.map((percentage, j) =>
+                    <td style={{backgroundColor:`RGB(150,${percentage * 2.5},80`}}>
+                      {`${percentage}`}
+                    </td>
+                  )}
+              </tr>
+              ))}
+            </TableElement>
+          </div>
+      : <h1>Loader</h1>
       }
     </ChartWrapper>
   );

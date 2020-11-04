@@ -79,3 +79,22 @@ export const DatePickerWrapper = styled.div`
     align-items: center;
     justify-content: center;
 `
+
+export const TableEmptySquare = styled.div`
+    width: 80px;
+    height: 60px;
+    border: 2px solid #0085a3;
+    background: #ffff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+`
+
+export const TableElement = styled.table`
+
+th, td, tr {
+    width: 80px;
+    height: 60px;
+    border: 2px solid #0085a3;
+    background: #ffff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.25);
+}
+`

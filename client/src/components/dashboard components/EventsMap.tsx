@@ -38,16 +38,13 @@ const EventsMap: React.FC<{}> = ({}) => {
             <GoogleMap
               options={ 
                 {
-                    draggable: true,
-                    // scrollwheel: false,
-                    // zoomControl: false,
+                    disableDefaultUI: true
                 }
               }
               mapContainerStyle={mapContainerStyle}
               center={defaultCenter}
               zoom={1.5}
             >
-            {/* <div> */}
                 <MarkerClusterer
                     averageCenter
                     enableRetinaIcons
@@ -67,10 +64,9 @@ const EventsMap: React.FC<{}> = ({}) => {
                         />
                     ))
 
-                       : <h1>Loader</h1>
+                        : <h1>Loader</h1>
                 }
                 </MarkerClusterer>
-            {/* </div> */}
             </GoogleMap>
         </LoadScript>
     </MapWrapper>
