@@ -55,7 +55,7 @@ const RetentionCohort = () => {
               <th>registration</th>
               {weeks.map((week) => (
                 <th key={"week" + week.registrationWeek}>{
-                  `week${week.registrationWeek}`
+                  `week ${week.registrationWeek}`
                   }</th>
               ))}
             </tr>

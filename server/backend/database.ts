@@ -970,7 +970,7 @@ const OneDay: number = OneHour * 24
 const OneWeek: number = OneDay*7
 
 function generateWeekObject(offset: number): { [day: string]: Event[] } {
-  let day: number = Date.now() - (offset + 7) * OneDay;
+  let day: number = Date.now() - (offset + 6) * OneDay;
 
   const week: { [day: string]: [] } = {};
 
@@ -1012,13 +1012,13 @@ function generateDayObject(): { [day: string]: Event[] } {
 }
 
 export const getLastWeekEventsCount = (offset: number) => {
-  const Days = OneDay * 7;
-  const Offset = OneDay * offset;
-  const dateInMili = new Date(new Date(Date.now()).toDateString()).getTime();
-  const dayLimit = dateInMili - Days - Offset;
+  const Days: number = OneDay * 6; //518400000
+  const Offset: number= OneDay * offset;
+  const dateInMili: number = new Date(new Date().toDateString()).getTime();
+  const dayLimit: number = dateInMili - Days - Offset;
   const groupByDates = db
     .get(EVENT_TABLE)
-    .filter((event: Event) => event.date > dayLimit && event.date < dateInMili - Offset)
+    .filter((event: Event) => event.date > dayLimit && event.date < dateInMili - Offset + OneDay)
     .sort((e1: Event, e2: Event) => e1.date - e2.date)
     .groupBy((event:Event) => {
       const date = new Date(event.date);
@@ -1034,7 +1034,7 @@ export const getLastWeekEventsCount = (offset: number) => {
 
   let arrResult = Object.keys(weekDays).map((day: string) => {
     const count = countBy((e: Event) => {
-      const date = new Date(e.date);
+      const date: Date = new Date(e.date);
       return `${date.getFullYear()}/${date.getMonth() + 1}/${date.getDate()}`;
     }, uniqBy("session_id", weekDays[day]));
     return count;
