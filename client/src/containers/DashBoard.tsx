@@ -11,23 +11,42 @@ import GenericPieChart from "components/PieChart";
 import RetentionCohort from "components/RetentionCohort";
 import AllEventsLog from "components/AllEventsLog";
 import LocationChart from "components/LocationsChart";
+import { Brightness2Sharp } from "@material-ui/icons";
+import WbSunnySharpIcon from "@material-ui/icons/WbSunnySharp";
+
 export interface Props {
   authService: Interpreter<AuthMachineContext, any, AuthMachineEvents, any>;
 }
 
 const GlobalStyle = createGlobalStyle`
-body {
-  font-family: Arial, Helvetica, sans-serif;
+body{
+  transition: all 0.50s linear;
 }
 `;
 
 const PairContainer = styled.div`
   display: flex;
   align-items: flex-end;
+  margin: 5vh 2vw;
 
   @media screen and (max-width: 1000px) {
     flex-direction: column;
+    margin: 0 1vw;
   }
+`;
+
+const Header = styled.span`
+  font-size: 2.5em;
+  margin: 2vh auto;
+  color: ${(props) => props.theme.body.text};
+`;
+
+const ThemeButton = styled.span`
+  position: absolute;
+  top: 3vh;
+  left: 2vw;
+  font-size: 2.5em;
+  cursor: pointer;
 `;
 
 const DashBoard: React.FC = () => {
@@ -35,14 +54,21 @@ const DashBoard: React.FC = () => {
 
   const toggleTheme = (): void => changeTheme();
 
-  const currentStyle = theme === "light" ? lightTheme : darkTheme;
+  const currentStyle: object = theme === "light" ? lightTheme : darkTheme;
 
   return (
     <>
-      <GlobalStyle />
       <ThemeProvider theme={currentStyle}>
+        <GlobalStyle />
         <ChartsLayout>
-          <button onClick={toggleTheme}>Dark mode</button>
+          <Header>Stats & Analytics</Header>
+          <ThemeButton onClick={toggleTheme}>
+            {theme === "light" ? (
+              <WbSunnySharpIcon fontSize={"inherit"} color={"inherit"} />
+            ) : (
+              <Brightness2Sharp fontSize={"inherit"} color={"inherit"} />
+            )}
+          </ThemeButton>
           <PairContainer>
             <div id="chart1" className="line-charts">
               <SessionsByHoursChart />

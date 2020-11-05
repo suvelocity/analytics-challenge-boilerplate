@@ -8,6 +8,7 @@ export const lightTheme = {
     axis: "#747474",
     graph: "#3F51B5",
     text: "#111111",
+    material: "rgba(126, 176, 237,0.65)",
   },
 };
 
@@ -21,5 +22,6 @@ export const darkTheme = {
     axis: "#FFF",
     graph: "#a3417a",
     text: "#FFF",
+    material: "rgba(235, 129, 189,0.7)",
   },
 };

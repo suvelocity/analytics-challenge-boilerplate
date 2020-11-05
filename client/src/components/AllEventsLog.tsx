@@ -59,7 +59,7 @@ const AccordionDetails = withStyles((theme) => ({
 }))(MuiAccordionDetails);
 
 const LogsWrapper = styled.div`
-  background-color: ${(props) => props.theme.chart.graph};
+  background-color: ${(props) => props.theme.chart.material};
   display: flex;
   height: 400px;
   font-size: "20px";
@@ -75,7 +75,8 @@ const SortingColumn = styled.div`
   width: 20%;
   margin: 0 auto;
   @media screen and (max-width: 700px) {
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: 2fr repeat(3, 1fr);
     width: 100%;
   }
 `;
@@ -88,6 +89,13 @@ const Logs = styled.div`
   @media screen and (max-width: 700px) {
     width: 100%;
   }
+`;
+
+const Header = styled.div`
+  color: ${(props) => props.theme.body.text};
+  text-align: center;
+  font-size: 3em;
+  margin-bottom: 3vh;
 `;
 
 //constant filters
@@ -378,142 +386,145 @@ const AllEventsLog: React.FC = () => {
   // const logs = data.map((event: Event) => event._id);
 
   return (
-    <LogsWrapper>
-      <SortingColumn>
-        <TextField label="Search" onChange={handleSearch} />
-        <FormControl>
-          <InputLabel>Event Type</InputLabel>
-          <Select
-            value={query?.type ? query.type : "All"}
-            name="type"
-            onChange={handleSelect}
-            autoWidth
-          >
-            <MenuItem value={"All"}>All</MenuItem>
-            {pages.map((page: eventName) => (
-              <MenuItem value={page}>{page}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <InputLabel>Browser</InputLabel>
-          <Select
-            value={query.browser ? query.browser : "All"}
-            name="browser"
-            onChange={handleSelect}
-            autoWidth
-          >
-            <MenuItem value="All">All</MenuItem>
-            {browsers.map((browser: browser) => (
-              <MenuItem value={browser}>{browser}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl>
-          <InputLabel>Operating System</InputLabel>
-          <Select value={query.os ? query.os : "All"} name="os" onChange={handleSelect} autoWidth>
-            <MenuItem value="All">All</MenuItem>
-            {operatingSystems.map((os: os) => (
-              <MenuItem value={os}>{os}</MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </SortingColumn>
-      <Logs>
-        {data.map((log: Event, i: number) => {
-          if (data.length === i + 1) {
-            return (
-              <Accordion
-                square
-                expanded={expanded === `panel${i}`}
-                onChange={handleChange(`panel${i}`)}
-              >
-                <AccordionSummary
-                  style={{
-                    backgroundColor: themeContext.chart.background,
-                    color: themeContext.chart.text,
-                  }}
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls={`panel${i}a-content`}
-                  id={`panel${i}d-header`}
-                  ref={lastBookElementRef}
-                  key={`log${i}`}
-                >
-                  <Typography>User {log.distinct_user_id}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    <b>Event Name: </b> {log.name}
-                    <br />
-                    <b>Date: </b> {convertToDate(log.date)}
-                    <br />
-                    <b>Browser: </b>
-                    {log.browser}
-                    <br />
-                    <b>Operating System: </b> {log.os}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            );
-          } else {
-            return (
-              <Accordion
-                square
-                expanded={expanded === `panel${i}`}
-                onChange={handleChange(`panel${i}`)}
-              >
-                <AccordionSummary
-                  style={{
-                    backgroundColor: themeContext.chart.background,
-                    color: themeContext.chart.text,
-                  }}
-                  expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
-                  aria-controls={`panel${i}a-content`}
-                  id={`panel${i}d-header`}
-                  key={`log${i}`}
-                >
-                  <Typography>User {log.distinct_user_id}</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <Typography>
-                    <b>Event Name: </b> {log.name}
-                    <br />
-                    <b>Date: </b> {convertToDate(log.date)}
-                    <br />
-                    <b>Browser: </b>
-                    {log.browser}
-                    <br />
-                    <b>Operating System: </b> {log.os}
-                  </Typography>
-                </AccordionDetails>
-              </Accordion>
-            );
-          }
-        })}
-
-        {!loading && data.length === 0 && (
-          <Accordion square expanded={expanded === `panel0`} onChange={handleChange(`panel0`)}>
-            <AccordionSummary
-              style={{
-                backgroundColor: themeContext.chart.background,
-                color: themeContext.chart.text,
-              }}
-              expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
-              aria-controls={`panel0a-content`}
-              id={`panel0d-header`}
-              key={`log0`}
+    <>
+      <Header>All Events Log</Header>
+      <LogsWrapper>
+        <SortingColumn>
+          <TextField label="Search" onChange={handleSearch} />
+          <FormControl>
+            <InputLabel>Event Type</InputLabel>
+            <Select
+              value={query?.type ? query.type : "All"}
+              name="type"
+              onChange={handleSelect}
+              autoWidth
             >
-              <Typography>No results!</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography>:(</Typography>
-            </AccordionDetails>
-          </Accordion>
-        )}
-        <div>{loading && "Loading..."}</div>
-        <div>{error && "Error"}</div>
-      </Logs>
-    </LogsWrapper>
+              <MenuItem value={"All"}>All</MenuItem>
+              {pages.map((page: eventName) => (
+                <MenuItem value={page}>{page}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel>Browser</InputLabel>
+            <Select
+              value={query.browser ? query.browser : "All"}
+              name="browser"
+              onChange={handleSelect}
+              autoWidth
+            >
+              <MenuItem value="All">All</MenuItem>
+              {browsers.map((browser: browser) => (
+                <MenuItem value={browser}>{browser}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+          <FormControl>
+            <InputLabel>Operating System</InputLabel>
+            <Select value={query.os ? query.os : "All"} name="os" onChange={handleSelect} autoWidth>
+              <MenuItem value="All">All</MenuItem>
+              {operatingSystems.map((os: os) => (
+                <MenuItem value={os}>{os}</MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </SortingColumn>
+        <Logs>
+          {data.map((log: Event, i: number) => {
+            if (data.length === i + 1) {
+              return (
+                <Accordion
+                  square
+                  expanded={expanded === `panel${i}`}
+                  onChange={handleChange(`panel${i}`)}
+                >
+                  <AccordionSummary
+                    style={{
+                      backgroundColor: themeContext.chart.background,
+                      color: themeContext.chart.text,
+                    }}
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls={`panel${i}a-content`}
+                    id={`panel${i}d-header`}
+                    ref={lastBookElementRef}
+                    key={`log${i}`}
+                  >
+                    <Typography>User {log.distinct_user_id}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography>
+                      <b>Event Name: </b> {log.name}
+                      <br />
+                      <b>Date: </b> {convertToDate(log.date)}
+                      <br />
+                      <b>Browser: </b>
+                      {log.browser}
+                      <br />
+                      <b>Operating System: </b> {log.os}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              );
+            } else {
+              return (
+                <Accordion
+                  square
+                  expanded={expanded === `panel${i}`}
+                  onChange={handleChange(`panel${i}`)}
+                >
+                  <AccordionSummary
+                    style={{
+                      backgroundColor: themeContext.chart.background,
+                      color: themeContext.chart.text,
+                    }}
+                    expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
+                    aria-controls={`panel${i}a-content`}
+                    id={`panel${i}d-header`}
+                    key={`log${i}`}
+                  >
+                    <Typography>User {log.distinct_user_id}</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Typography>
+                      <b>Event Name: </b> {log.name}
+                      <br />
+                      <b>Date: </b> {convertToDate(log.date)}
+                      <br />
+                      <b>Browser: </b>
+                      {log.browser}
+                      <br />
+                      <b>Operating System: </b> {log.os}
+                    </Typography>
+                  </AccordionDetails>
+                </Accordion>
+              );
+            }
+          })}
+
+          {!loading && data.length === 0 && (
+            <Accordion square expanded={expanded === `panel0`} onChange={handleChange(`panel0`)}>
+              <AccordionSummary
+                style={{
+                  backgroundColor: themeContext.chart.background,
+                  color: themeContext.chart.text,
+                }}
+                expandIcon={<ExpandMoreIcon style={{ color: themeContext.chart.graph }} />}
+                aria-controls={`panel0a-content`}
+                id={`panel0d-header`}
+                key={`log0`}
+              >
+                <Typography>No results!</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Typography>:(</Typography>
+              </AccordionDetails>
+            </Accordion>
+          )}
+          <div>{loading && "Loading..."}</div>
+          <div>{error && "Error"}</div>
+        </Logs>
+      </LogsWrapper>
+    </>
   );
 };
 

@@ -25,11 +25,12 @@ export const ChartsLayout = styled.div`
   width: 80vw;
 
   .line-charts {
-    width: 55%;
+    width: 60%;
     height: 48vh;
-    margin: 5vh 0;
+    margin: 5vh 2vw 0 0;
     grid-area: line-chart;
     @media only screen and (max-width: 1000px) {
+      margin: 5vh auto;
       width: 100%;
     }
     /* background-color: ${(props) => props.theme.body.background};
@@ -45,7 +46,6 @@ export const ChartsLayout = styled.div`
   .pie-charts {
     width: 40%;
     height: 48vh;
-    margin: 5vh 2vh;
     grid-area: pie-chart;
     @media only screen and (max-width: 1000px) {
       margin: 5vh auto;
@@ -57,17 +57,18 @@ export const ChartsLayout = styled.div`
     width: 95%;
     height: 75vh;
     margin: 5vh auto;
+    overflow-x: auto;
   }
   #all-events {
     width: 95%;
     height: 35%;
-    margin: 0 auto;
+    margin: 5vh auto 5vh;
     /* background-color: green;
     grid-area: chart4; */
   }
   #locations {
+    margin: 5vh 0;
     width: 100%;
     height: 100%;
-    background-color: pink;
   }
 `;
